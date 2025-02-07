@@ -1,0 +1,7 @@
+Flask
+python-docx
+transliterate
+flask-cors
+pywin32
+py_eureka_client
+python-dotenv
