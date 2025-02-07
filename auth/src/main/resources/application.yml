@@ -1,0 +1,31 @@
+server:
+  port: 8081  # auth server porti
+
+spring:
+  application:
+    name: auth  # Application nomi
+  datasource:
+    driver-class-name: org.postgresql.Driver  # PostgreSQL driver nomi
+    url: jdbc:postgresql://localhost:5432/auth_cloud  # PostgreSQL manzili
+    username: postgres  # PostgreSQL foydalanuvchi nomi
+    password: 1  # PostgreSQL foydalanuvchi paroli
+  sql:
+    init:
+      mode: always  # SQL fayllarini har safar ishga tushirish
+  main:
+    banner-mode: off  # Banner o'chirish
+    web-application-type: servlet  # Web application turi
+  jpa:
+    hibernate:
+      ddl-auto: update  # JPA schema avtomatik yangilansin
+    show-sql: true  # SQL so'rovlarini konsolga chiqarsin
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true  # Lazy loadingni yoqish
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server manzili
+  instance:
+    prefer-ip-address: true

@@ -1,0 +1,13 @@
+server:
+  port: 8080  # Gateway uchun port
+
+spring:
+  application:
+    name: gateway  # Gateway uchun application nomi
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  # Eureka server manzili
+  instance:
+    prefer-ip-address: true # IP manzilni o'zlashtirish

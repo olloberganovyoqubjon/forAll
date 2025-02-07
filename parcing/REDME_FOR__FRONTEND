@@ -1,0 +1,49 @@
+.env file ichida port va database parametrlari berilgan (o'zgartirib moslashtirish mumkin)
+murojaat1.exe - murojaat postgre bazasi tablitsalarini yaratib beradi. Har safar ishga tushganda eski tablitsani o'chirib yangi yaratadi
+murojaat.exe - hech qanday tablitsa yaratmaydi. bor tablitsa bilan ishlaydi
+
+//POST localhost:3000/api/signup
+
+{
+    "full_name":"full_name",
+    "name":"name1",
+    "department":10,
+    "password":"password"
+}
+
+//POST localhost:3000/api/login
+
+{
+    "name":"name1",
+    "password":"password"
+}
+
+//GET localhost:3000/api/request/?page=1&perPage=3&status=true
+
+
+//POST localhost:3000/api/request/create
+
+{
+    "request_name":"xato",
+    "telephone_number":"6176"
+}
+
+
+//GET localhost:3000/api/request/update/id
+//bu yerda id o'rniga son beriladi
+
+
+//GET localhost:3000/api/pars/allSitesWithCategory
+
+//POST localhost:3000/api/pars/uploadPars
+
+{
+    post pars.png
+}
+
+//GET localhost:3000/api/pars/presidentNews
+
+//GET localhost:3000/api/pars//newsByIdSite/:id
+//bu yerda id o'rniga son beriladi
+
+//localhost:8080/api/pars/newsByIdSites/0/newsByIdCategory/0
