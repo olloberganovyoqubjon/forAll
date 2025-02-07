@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
      * @throws IOException Исключение, возникающее при ошибках ввода-вывода
      */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
 
         try {
             String authorization = request.getHeader("Authorization"); // Получение заголовка Authorization из запроса

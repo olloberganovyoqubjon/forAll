@@ -5,9 +5,31 @@ spring:
   application:
     name: gateway  # Gateway uchun application nomi
 
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://auth  # Load balancer orqali auth servisi
+          predicates:
+            - Path=/auth/**  # Auth servisi uchun yo'nalishlar
+          filters:
+            - RewritePath=/auth/(?<remaining>.*), /${remaining}  # /auth ni olib tashlaydi
+
+        - id: appeal-service
+          uri: lb://appeal  # Load balancer orqali appeal servisi
+          predicates:
+            - Path=/appeal/**  # Appeal servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/appeal/(?<remaining>.*), /${remaining}  # /appeal ni olib tashlaydi
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/  # Eureka server manzili
   instance:
     prefer-ip-address: true # IP manzilni o'zlashtirish
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG  # Gateway loglari

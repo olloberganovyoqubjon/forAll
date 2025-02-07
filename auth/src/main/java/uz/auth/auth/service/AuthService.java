@@ -57,12 +57,12 @@ public class AuthService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(username + " topilmadi!"));
     }
 
-//    public Users findUserByUserName(String username) {
-//
-//        return repository.findByUsername(username)
-//                .orElseThrow(() -> new UsernameNotFoundException(username + " topilmadi!"));
-//    }
-
-
+    public ApiResult validateToken(String token) {
+        boolean tokenExpired = jwtProvider.isTokenExpired(token);
+        if (tokenExpired) {
+            return new ApiResult("Token expired or invalid!", false);
+        }
+        return new ApiResult("Token success", true);
+    }
 
 }

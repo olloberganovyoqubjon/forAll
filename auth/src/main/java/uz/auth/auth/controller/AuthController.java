@@ -71,6 +71,16 @@ public class AuthController {
 //        return ResponseEntity.status(HttpStatus.OK).body(authenticate);
 //
 //    }
+
+    @GetMapping("validate")
+    public HttpEntity<?> validateToken(@RequestParam String token) {
+        ApiResult apiResult = service.validateToken(token);
+        if (apiResult.isSuccess()) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 }
 
 
