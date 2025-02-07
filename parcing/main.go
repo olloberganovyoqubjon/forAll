@@ -29,8 +29,8 @@ func main() {
 
 	// Register with Eureka server
 	client := eureka.NewClient(&eureka.Config{
-		DefaultZone:           "http://127.0.0.1:8761/eureka/",
-		App:                   "parsing",
+		DefaultZone:           os.Getenv("EUREKA_SERVER_URL"),
+		App:                   os.Getenv("APP_NAME"),
 		Port:                  port,
 		RenewalIntervalInSecs: 10,
 		DurationInSecs:        30,
