@@ -23,6 +23,22 @@ spring:
             - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/appeal/(?<remaining>.*), /${remaining}  # /appeal ni olib tashlaydi
 
+        - id: python_translate-service
+          uri: lb://python_translate  # Load balancer orqali python-translate servisi
+          predicates:
+            - Path=/python_translate/**  # Python_translate servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/python_translate/(?<remaining>.*), /${remaining}  # /python_translate ni olib tashlaydi
+
+        - id: parsing-service
+          uri: lb://parsing  # Load balancer orqali parsing servisi
+          predicates:
+              - Path=/parsing/**  # Parsing servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/parsing/(?<remaining>.*), /${remaining}  # /parsing ni olib tashlaydi
+
 eureka:
   client:
     service-url:
