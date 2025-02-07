@@ -7,6 +7,19 @@ spring:
 
   cloud:
     gateway:
+      globalcors: # Barcha servislarga ruxsat berish
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"  # Barcha originlarga ruxsat berish
+            allowedMethods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+            allowedHeaders: "*"  # Barcha headerlarga ruxsat berish
+            allowCredentials: true  # Credentiallarni ruxsat berish
+
+
       routes:
         - id: auth-service
           uri: lb://auth  # Load balancer orqali auth servisi
