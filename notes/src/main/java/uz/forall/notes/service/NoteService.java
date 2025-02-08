@@ -105,4 +105,23 @@ public class NoteService {
         }
         return new ApiResult("Notes found", true, categoryWithNotesDtoList);
     }
+
+    public ApiResult changeCategory(Long noteId, Long categoryId, Long userId) {
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+        if (optionalCategory.isEmpty()) {
+            return new ApiResult("Category not found", false);
+        }
+        Category category = optionalCategory.get();
+        if (!category.getUserId().equals(userId)) {
+            return new ApiResult("Category not found", false);
+        }
+        Optional<Note> optionalNote = noteRepository.findById(noteId);
+        if (optionalNote.isEmpty()) {
+            return new ApiResult("Note not found", false);
+        }
+        Note note = optionalNote.get();
+        note.setCategory(category);
+        noteRepository.save(note);
+        return new ApiResult("Note changed category", true);
+    }
 }

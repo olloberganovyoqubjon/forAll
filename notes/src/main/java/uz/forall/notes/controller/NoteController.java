@@ -53,4 +53,10 @@ public class NoteController {
         ApiResult apiResult = noteService.getNotesToUser(userId);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
+
+    @GetMapping("changeCategory/{noteId}/{categoryId}/{userId}")
+    public HttpEntity<?> changeCategory(@PathVariable Long noteId, @PathVariable Long categoryId, @PathVariable Long userId) {
+        ApiResult apiResult = noteService.changeCategory(noteId, categoryId, userId);
+        return ResponseEntity.status(apiResult.isSuccess() ? 202 : 409).body(apiResult);
+    }
 }
