@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Socket.IO Test Mijoz</title>
+    <!-- Socket.IO mijoz kutubxonasi -->
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+</head>
+<body>
+<h1>Socket.IO bilan real vaqt aloqasi</h1>
+<button onclick="sendMessage()">Xabar yuborish</button>
+<div id="response"></div>
+
+<script>
+    // Socket.IO serverga ulanish
+    const socket = io('http://localhost:9092', {
+        transports: ['websocket']  // Faqat WebSocket protokolini ishlatamiz
+    });
+
+    // Ulanish muvaffaqiyatli bo'lsa
+    socket.on('connect', () => {
+        console.log('Serverga muvaffaqiyatli ulandik!');
+    });
+
+    // Serverdan "message" eventini olish
+    socket.on('message', (data) => {
+        console.log('Serverdan xabar:', data);
+        document.getElementById('response').innerText = 'Serverdan javob: ' + data;
+    });
+
+    // Serverga xabar yuborish funksiyasi
+    function sendMessage() {
+        socket.emit('message', 'Salom, Spring Boot Socket.IO server!');
+    }
+</script>
+</body>
+</html>

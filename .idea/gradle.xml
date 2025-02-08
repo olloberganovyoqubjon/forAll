@@ -4,6 +4,14 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/appeal" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/appeal" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/auth" />
         <option name="modules">
           <set>
@@ -12,18 +20,18 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/auth/build/generated/sources/annotationProcessor/java/main/appeal" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/auth/build/generated/sources/annotationProcessor/java/main/appeal" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/gateway" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/gateway" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/notes" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/notes" />
           </set>
         </option>
       </GradleProjectSettings>

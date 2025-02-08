@@ -1,0 +1,18 @@
+server:
+  port: 8083  # notes server porti
+
+spring:
+  application:
+    name: notes  # Application nomi
+  datasource:
+    driver-class-name: org.postgresql.Driver  # PostgreSQL driver nomi
+    url: jdbc:postgresql://localhost:5432/notes  # PostgreSQL manzili
+    username: postgres  # PostgreSQL foydalanuvchi nomi
+    password: 1  # PostgreSQL foydalanuvchi paroli
+
+eureka:
+  client:
+    service-url:
+        defaultZone: http://localhost:8761/eureka/  # Eureka server manzili
+  instance:
+    prefer-ip-address: true # IP manzilni ishlatish
