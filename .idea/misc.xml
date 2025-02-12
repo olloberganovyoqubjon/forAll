@@ -5,6 +5,7 @@
     <file type="web" url="file://$PROJECT_DIR$/appeal" />
     <file type="web" url="file://$PROJECT_DIR$/auth" />
     <file type="web" url="file://$PROJECT_DIR$/gateway" />
+    <file type="web" url="file://$PROJECT_DIR$/library" />
     <file type="web" url="file://$PROJECT_DIR$/notes" />
     <file type="web" url="file://$PROJECT_DIR$/server" />
   </component>
