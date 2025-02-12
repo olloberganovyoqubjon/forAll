@@ -5,14 +5,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-import uz.forall.library.entity.Book;
 import uz.forall.library.payload.ApiResult;
 import uz.forall.library.payload.BookDto;
 import uz.forall.library.service.BookService;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
