@@ -1,12 +1,12 @@
 server:
-  port: 8084  # Auth server porti
+  port: 8085  # Auth server porti
 
 spring:
   application:
-    name: library  # Application nomi
+    name: youTube  # Application nomi
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/library
+    url: jdbc:postgresql://localhost:5432/youTube
     username: postgres
     password: 1
     hikari:
