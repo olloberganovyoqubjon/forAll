@@ -27,7 +27,7 @@ func ConnectParsDB() {
 }
 
 func GenerateParsDB() {
-	errm := ParsDB.AutoMigrate(parsModels.Sites{}, parsModels.Inf{}, parsModels.Contents{}, parsModels.Category{}, parsModels.Rade{})
+	errm := ParsDB.AutoMigrate(parsModels.Sites{}, parsModels.Inf{}, parsModels.Contents{}, parsModels.Category{}, parsModels.Rade{}, parsModels.Weather{})
 	if errm != nil {
 		log.Fatal("Migration failed")
 	}

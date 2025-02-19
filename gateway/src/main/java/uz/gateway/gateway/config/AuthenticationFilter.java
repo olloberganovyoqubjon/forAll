@@ -64,7 +64,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     private WebClient.Builder webClientBuilder;
 
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/parsing/presidentNews"
+            "/parsing/presidentNews",
+            "/parsing/wether"
     );
 
     public AuthenticationFilter() {

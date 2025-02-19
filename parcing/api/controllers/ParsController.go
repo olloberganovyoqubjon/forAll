@@ -20,8 +20,17 @@ import (
 )
 
 type Name struct {
+	Weather  Weather
 	InfList  []InfList
 	RadeList []Rades
+}
+
+type Weather struct {
+	TempMin           float32   `json:"tempMin"`
+	TempMax           float32   `json:"tempMax"`
+	WeatherNameFirst  string    `json:"weatherNameFirst"`
+	WeatherNameSecond string    `json:"weatherNameSecond"`
+	UpdateDate        time.Time `json:"updateDate"`
 }
 
 type InfList struct {
@@ -90,6 +99,23 @@ func SelectJson(file *multipart.FileHeader) {
 	// var radeList []RadeList
 	json.Unmarshal(byteResult, &name)
 	// json.Unmarshal(byteResult, &radeList)
+
+	weather := name.Weather
+	var weatherBase parsModels.Weather
+	if err := db.ParsDB.First(&weatherBase).Error; err != nil {
+		fmt.Println("Ma'lumot topilmadi yoki xato:", err)
+		return
+	}
+
+	// Qatorni yangilash
+	weatherBase.TempMin = weather.TempMin
+	weatherBase.TempMax = weather.TempMax
+	weatherBase.WeatherNameFirst = weather.WeatherNameFirst
+	weatherBase.WeatherNameSecond = weather.WeatherNameSecond
+	weatherBase.UpdateDate = weather.UpdateDate
+
+	// O‘zgarishlarni saqlash
+	db.ParsDB.Save(&weatherBase)
 
 	rades := name.RadeList
 
@@ -340,5 +366,17 @@ func GetNewsByIdSite(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"infsModel": infModel,
+	})
+}
+
+func GetWether(c *gin.Context) {
+	var weatherBase parsModels.Weather
+	if err := db.ParsDB.First(&weatherBase).Error; err != nil {
+		fmt.Println("Ma'lumot topilmadi yoki xato:", err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"weather": weatherBase,
 	})
 }
