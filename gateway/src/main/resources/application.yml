@@ -10,7 +10,7 @@ spring:
       globalcors: # Barcha servislarga ruxsat berish
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:3000"  # Barcha originlarga ruxsat berish
+            allowedOrigins: "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
             allowedMethods:
                 - GET
                 - POST
@@ -33,7 +33,7 @@ spring:
           predicates:
             - Path=/appeal/**  # Appeal servisi uchun yo'nalishlar
           filters:
-            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+#            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/appeal/(?<remaining>.*), /${remaining}  # /appeal ni olib tashlaydi
 
         - id: python_translate-service
@@ -41,7 +41,7 @@ spring:
           predicates:
             - Path=/python_translate/**  # Python_translate servisi uchun yo'nalishlar
           filters:
-            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+#            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/python_translate/(?<remaining>.*), /${remaining}  # /python_translate ni olib tashlaydi
 
         - id: parsing-service

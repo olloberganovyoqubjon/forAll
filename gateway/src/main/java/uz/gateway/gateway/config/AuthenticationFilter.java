@@ -55,11 +55,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
+
+    private static final List<String> EXCLUDED_PATHS = List.of(
+            "/parsing/presidentNews"
+    );
 
     public AuthenticationFilter() {
         super(Config.class);
@@ -68,6 +74,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+
+            String path = exchange.getRequest().getURI().getPath();
+            // Agar yo'l authentication tekshiruvidan istisno bo'lsa, filterni ishlatmaymiz
+            if (EXCLUDED_PATHS.contains(path)) {
+                return chain.filter(exchange);
+            }
+
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
             // Token borligini tekshirish
