@@ -19,6 +19,7 @@ func GetRoute(r *gin.Engine) {
 	r.GET("/newsByIdSite/:id", controllers.GetNewsByIdSite)
 
 	r.GET("/wether", controllers.GetWether)
+	r.GET("/rade", controllers.Getrade)
 	//sayt siteId  va categoryId ga qarab yangiliklarni olib beradi
 	//(siteId va categoryId 0 bolsa hamma oxirgi yangiliklarno olib beradi),
 	//(categoryId 0 bolsa siteId ga qarab oxirgi yangiliklarno olib beradi)

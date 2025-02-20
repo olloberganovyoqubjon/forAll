@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	db "main/db"
 	format_errors "main/internal/format-errors"
@@ -19,53 +19,51 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Name struct {
-	Weather  Weather
-	InfList  []InfList
-	RadeList []Rades
+type jSon struct {
+	Weather  Weather   `json:"weather"`
+	InfList  []InfList `json:"infList"`
+	RadeList []Rades   `json:"radeList"`
 }
-
 type Weather struct {
-	TempMin           float32   `json:"tempMin"`
-	TempMax           float32   `json:"tempMax"`
-	WeatherNameFirst  string    `json:"weatherNameFirst"`
-	WeatherNameSecond string    `json:"weatherNameSecond"`
-	UpdateDate        time.Time `json:"updateDate"`
+	TempMin           float32 `json:"tempMin"`
+	TempMax           float32 `json:"tempMax"`
+	WeatherNameFirst  string  `json:"weatherNameFirst"`
+	WeatherNameSecond string  `json:"weatherNameSecond"`
+	UpdateDate        int64   `json:"updateDate"`
 }
 
 type InfList struct {
-	Id         int
-	Link       string     `json:"link"`
-	Title      string     `json:"title"`
-	Img        string     `json:"img"`
-	Contents   []Contents `json:"contents"`
-	CreateDate string     `json:"createDate"`
-	Category   Category   `json:"category"`
+	Id         int       `json:"id"`
+	Link       string    `json:"link"`
+	Title      string    `json:"title"`
+	Img        string    `json:"img"`
+	Contents   []Content `json:"contents"`
+	CreateDate string    `json:"createDate"`
+	Category   Category  `json:"category"`
 }
 
-type Contents struct {
+type Content struct {
 	Content string `json:"content"`
 }
 
 type Category struct {
-	Id           int
+	Id           int    `json:"id"`
 	Name         string `json:"name"`
-	Sites        Sites  `json:"sites"`
 	CategoryName string `json:"categoryName"`
+	Sites        Sites  `json:"sites"`
 }
 
 type Sites struct {
-	Id   int
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
 type Rades struct {
-	Date      string  `json:"date"`
-	Code      string  `json:"code"`
-	CbPrice   float64 `json:"cbPrice"`
-	Title     string  `json:"title"`
-	ByPrice   float64 `json:"byPrice"`
-	CellPrice float64 `json:"cellPrice"`
+	Ccy  string  `json:"ccy"`
+	Name string  `json:"name"`
+	Rate float32 `json:"rate"` // Null qiymatga mos kelishi uchun pointer sifatida
+	Dif  float32 `json:"dif"`
+	Date string  `json:"date"`
 }
 
 func UploadPars(c *gin.Context) {
@@ -77,12 +75,6 @@ func UploadPars(c *gin.Context) {
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
 
-// func checkErr(err error) {
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
-
 func SelectJson(file *multipart.FileHeader) {
 	open, err := file.Open()
 	if err != nil {
@@ -93,14 +85,18 @@ func SelectJson(file *multipart.FileHeader) {
 
 	defer open.Close()
 
-	byteResult, _ := ioutil.ReadAll(open)
+	// byteResult, _ := ioutil.ReadAll(open)
+	byteResult, _ := io.ReadAll(open)
 
-	var name Name
-	// var radeList []RadeList
-	json.Unmarshal(byteResult, &name)
+	var jSon jSon
+	err = json.Unmarshal(byteResult, &jSon)
+	if err != nil {
+		fmt.Println("JSON parsingda xatolik:", err)
+		return
+	}
 	// json.Unmarshal(byteResult, &radeList)
 
-	weather := name.Weather
+	weather := jSon.Weather
 	var weatherBase parsModels.Weather
 	if err := db.ParsDB.First(&weatherBase).Error; err != nil {
 		fmt.Println("Ma'lumot topilmadi yoki xato:", err)
@@ -112,25 +108,34 @@ func SelectJson(file *multipart.FileHeader) {
 	weatherBase.TempMax = weather.TempMax
 	weatherBase.WeatherNameFirst = weather.WeatherNameFirst
 	weatherBase.WeatherNameSecond = weather.WeatherNameSecond
-	weatherBase.UpdateDate = weather.UpdateDate
+	weatherBase.UpdateDate = time.UnixMilli(weather.UpdateDate)
 
 	// O‘zgarishlarni saqlash
 	db.ParsDB.Save(&weatherBase)
 
-	rades := name.RadeList
+	rades := jSon.RadeList
 
-	for i, rade := range rades {
-		db.ParsDB.Updates(parsModels.Rade{
-			Date:      rade.Date,
-			Code:      rade.Code,
-			CbPrice:   float32(rade.CbPrice),
-			ByPrice:   float32(rade.ByPrice),
-			CellPrice: float32(rade.CellPrice),
-		}).Where("id", i+1)
-		fmt.Println(rade)
+	for _, rade := range rades {
+		// db.ParsDB.Updates(parsModels.Rade{
+		// 	Ccy:  rade.Ccy,
+		// 	Name: rade.Name,
+		// 	Rate: float32(rade.Rate),
+		// 	Dif:  float32(rade.Dif),
+		// 	Date: rade.Date,
+		// }).Where("ccy = ?", rade.Ccy)
+		// fmt.Println(rade)
+		db.ParsDB.Model(&parsModels.Rade{}).
+			Where("ccy = ?", rade.Ccy).
+			Updates(parsModels.Rade{
+				Ccy:  rade.Ccy,
+				Name: rade.Name,
+				Rate: rade.Rate,
+				Dif:  rade.Dif,
+				Date: rade.Date,
+			})
 	}
 
-	for _, inf := range name.InfList {
+	for _, inf := range jSon.InfList {
 		site := inf.Category.Sites
 		siteModel := parsModels.Sites{
 			Name: site.Name,
@@ -339,13 +344,6 @@ type InfModel struct {
 	CreateDate string   `json:"create_date"`
 }
 
-// type InfModelInf struct {
-// 	Id       int      `json:"id"`
-// 	Title    string   `json:"title"`
-// 	Img      string   `json:"img"`
-// 	Contents []string `json:"contents"`
-// }
-
 func GetNewsByIdSite(c *gin.Context) {
 	id := c.Param("id")
 	var infBase parsModels.Inf
@@ -378,5 +376,16 @@ func GetWether(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"weather": weatherBase,
+	})
+}
+
+func Getrade(c *gin.Context) {
+	var rades []parsModels.Rade
+	if err := db.ParsDB.Find(&rades).Error; err != nil {
+		fmt.Println("Ma'lumot topilmadi yoki xato:", err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"rades": rades,
 	})
 }

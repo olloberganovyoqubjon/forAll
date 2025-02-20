@@ -10,12 +10,16 @@ spring:
       globalcors: # Barcha servislarga ruxsat berish
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
+            allowedOrigins:
+#            "http://localhost:3000"       # Barcha originlarga ruxsat berish
+                - "http://localhost:3000"       # Barcha originlarga ruxsat berish
+                - "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
             allowedMethods:
                 - GET
                 - POST
                 - PUT
                 - DELETE
+                - OPTIONS
             allowedHeaders: "*"  # Barcha headerlarga ruxsat berish
             allowCredentials: true  # Credentiallarni ruxsat berish
 

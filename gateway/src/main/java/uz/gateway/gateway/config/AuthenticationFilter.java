@@ -49,8 +49,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -65,7 +67,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/parsing/presidentNews",
-            "/parsing/wether"
+            "/parsing/wether",
+            "/parsing/uploadPars",
+            "/parsing/rade"
     );
 
     public AuthenticationFilter() {
@@ -74,11 +78,18 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     @Override
     public GatewayFilter apply(Config config) {
+
         return (exchange, chain) -> {
 
             String path = exchange.getRequest().getURI().getPath();
+            ServerHttpRequest request = exchange.getRequest();
             // Agar yo'l authentication tekshiruvidan istisno bo'lsa, filterni ishlatmaymiz
             if (EXCLUDED_PATHS.contains(path)) {
+                return chain.filter(exchange);
+            }
+
+            // OPTIONS so‘rovlarini tekshirmaymiz (CORS preflight uchun)
+            if (request.getMethod() == HttpMethod.OPTIONS) {
                 return chain.filter(exchange);
             }
 
