@@ -47,11 +47,11 @@ public class SecuryConfig implements WebMvcConfigurer {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Отключение защиты CSRF
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/sign-in", "/api/user/login","/api/user/logout","/api/auth/refreshToken**").permitAll()
-                        .requestMatchers("/api/status").permitAll()
-                        .requestMatchers("/api/getdiskspace").permitAll()
-                        .requestMatchers("/api/getservertime").permitAll()
-                        .requestMatchers("/api/auth/validate").permitAll()
+                        .requestMatchers("/auth/sign-in", "/user/login","/user/logout","/auth/refreshToken**").permitAll()
+                        .requestMatchers("/status").permitAll()
+                        .requestMatchers("/getdiskspace").permitAll()
+                        .requestMatchers("/getservertime").permitAll()
+                        .requestMatchers("/auth/validate").permitAll()
                         .anyRequest().authenticated() // Любой другой запрос должен быть аутентифицирован
                 )
                 .httpBasic(withDefaults()); // Использование базовой HTTP-аутентификации

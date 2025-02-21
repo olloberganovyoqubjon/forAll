@@ -17,7 +17,7 @@ import java.util.List;
 // Аннотация, указывающая, что этот класс является REST-контроллером
 @RestController
 // Указание базового пути для всех эндпоинтов в этом контроллере
-@RequestMapping("/api/role")
+@RequestMapping("/role")
 // Аннотация Swagger для документации API
 public class RoleController {
 
