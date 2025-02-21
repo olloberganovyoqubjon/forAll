@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static uz.forall.library.LibraryApplication.uploadDir;
+
 @Service
 public class BookService {
+
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
 
@@ -54,9 +57,6 @@ public class BookService {
         Book book = new Book(null, file.getContentType(), file.getOriginalFilename(), category);
         Book savedBook = bookRepository.save(book); // Bu yerda bookId (UUID) avtomatik yaratiladi
 
-        // Faylni saqlash joyi (masalan, uploads package)
-        String uploadDir = "uploads/";
-
         // Faylni bookId bilan saqlash
         String fileExtension = getFileExtension(file.getOriginalFilename());
         String filePath = uploadDir + savedBook.getId() + (fileExtension.isEmpty() ? "" : "." + fileExtension);
@@ -86,7 +86,7 @@ public class BookService {
         }
         Book book = optionalBook.get();
         // Faylni olish joyi (masalan, uploads papkasi)
-        String uploadDir = "uploads/";
+
 
         // Fayl kengaytmasini olish (agar kerak bo'lsa)
         String fileExtension = getFileExtension(book.getName());
