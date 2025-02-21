@@ -3,6 +3,7 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/appeal" />
+    <file type="web" url="file://$PROJECT_DIR$/appStore" />
     <file type="web" url="file://$PROJECT_DIR$/auth" />
     <file type="web" url="file://$PROJECT_DIR$/gateway" />
     <file type="web" url="file://$PROJECT_DIR$/library" />

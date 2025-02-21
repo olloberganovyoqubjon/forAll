@@ -69,13 +69,21 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             "/parsing/presidentNews",
             "/parsing/wether",
             "/parsing/uploadPars",
-            "/parsing/rade"
+            "/parsing/rade",
+            "/parsing/newsByIdSites",
+            "/parsing/allSitesWithCategory",
+            "/auth/user/login"
     );
 
     public AuthenticationFilter() {
         super(Config.class);
     }
 
+    /**
+     * kelayotgan so'rovni tekshirish
+     * @param config konfiguratsiya
+     * @return GatewayFilter
+     */
     @Override
     public GatewayFilter apply(Config config) {
 
@@ -84,7 +92,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             String path = exchange.getRequest().getURI().getPath();
             ServerHttpRequest request = exchange.getRequest();
             // Agar yo'l authentication tekshiruvidan istisno bo'lsa, filterni ishlatmaymiz
-            if (EXCLUDED_PATHS.contains(path)) {
+            if (EXCLUDED_PATHS.stream().anyMatch(path::startsWith)) {
                 return chain.filter(exchange);
             }
 
