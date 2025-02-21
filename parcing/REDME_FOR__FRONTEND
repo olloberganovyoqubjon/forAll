@@ -46,4 +46,8 @@ murojaat.exe - hech qanday tablitsa yaratmaydi. bor tablitsa bilan ishlaydi
 //GET localhost:3000/api/pars//newsByIdSite/:id
 //bu yerda id o'rniga son beriladi
 
-//localhost:8080/api/pars/newsByIdSites/0/newsByIdCategory/0
+//localhost:8080/parsing/newsByIdSites/:idSite/newsByIdCategory/:idCategory?perPage=1&page=3
+//bu yerda idSite o'rniga saytId beriladi, idCategory o'rniga tanlangan sayt ichidagi categoriya id raqami beriladi
+//agar idSite o'rniga 0 berilsa hamma oxirgi yangiliklar beriladi
+//agar idCategory o'rniga 0 berilsa sayt id raqamiga qarab hamma oxirgi yangiliklar beriladi
+//perPage nechta yangilik kelishini belgilaydi, page bu page raqanini belgilaydi

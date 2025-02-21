@@ -11,14 +11,13 @@ func GetRoute(r *gin.Engine) {
 	r.POST("/uploadPars", controllers.UploadPars)
 	//hammma sayt va kategoruyalarini pars qiladi
 	r.GET("/allSitesWithCategory", controllers.GetAllSitesWithCategory)
-	//valyutalarni bazadan oladi
-	r.GET("/rates", controllers.GetRades)
 	//oxirgi 10 ta prezident yangiliklarini olib beradi
 	r.GET("/presidentNews", controllers.GetPresidentNews)
 	//sayt siteId ga qarab yangiliklarni olib beradi
 	r.GET("/newsByIdSite/:id", controllers.GetNewsByIdSite)
-
+	//ob-havo olib beradi
 	r.GET("/wether", controllers.GetWether)
+	//valyutalarni bazadan oladi
 	r.GET("/rade", controllers.Getrade)
 	//sayt siteId  va categoryId ga qarab yangiliklarni olib beradi
 	//(siteId va categoryId 0 bolsa hamma oxirgi yangiliklarno olib beradi),
