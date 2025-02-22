@@ -1,5 +1,5 @@
 server:
-  port: 8083  # notes server porti
+  port: 0  # notes server porti
 
 spring:
   application:

@@ -1,14 +1,16 @@
 import os
-from flask import Flask, request, send_file # type: ignore
-from docx import Document # type: ignore
+import socket
+from flask import Flask, request, send_file
+from docx import Document
 from io import BytesIO
 import transliterate
-from flask_cors import CORS # type: ignore
-import win32com.client as win32 # type: ignore
-from werkzeug.utils import secure_filename # type: ignore
-import pythoncom # type: ignore
-from py_eureka_client import eureka_client # type: ignore
+from flask_cors import CORS
+import win32com.client as win32
+from werkzeug.utils import secure_filename
+import pythoncom
+from py_eureka_client import eureka_client
 from dotenv import load_dotenv
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -34,7 +36,6 @@ def upload_file(lang):
     file.save(file_path)
 
     if filename.endswith('.doc'):
-        # Handle .doc files using win32com.client
         translated_docx_bytes = translate_doc_file(file_path, lang)
         if translated_docx_bytes:
             return send_file(translated_docx_bytes, mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document", download_name="translated_document.docx")
@@ -54,29 +55,24 @@ def upload_file(lang):
 
 def translate_doc_file(doc_path, lang):
     try:
-        pythoncom.CoInitialize()  # Initialize COM library
+        pythoncom.CoInitialize()
         word = win32.Dispatch("Word.Application")
         doc = word.Documents.Open(doc_path)
 
-        # Transliterate the document text
         for paragraph in doc.Paragraphs:
             paragraph.Range.Text = transliterate.transliterate(paragraph.Range.Text, lang)
         
-        # Save the document to a BytesIO object
         translated_docx_bytes = BytesIO()
         docx_path = os.path.join(app.config['UPLOAD_FOLDER'], "temp_translated.docx")
-        doc.SaveAs(docx_path, FileFormat=16)  # Save as .docx (FileFormat=16)
+        doc.SaveAs(docx_path, FileFormat=16)  
 
-        # Close the Word document
         doc.Close()
         word.Quit()
 
-        # Read the saved .docx into memory and return it
         with open(docx_path, 'rb') as f:
             translated_docx_bytes.write(f.read())
         translated_docx_bytes.seek(0)
 
-        # Clean up the temp file
         os.remove(docx_path)
 
         return translated_docx_bytes
@@ -84,7 +80,7 @@ def translate_doc_file(doc_path, lang):
         print(f"Error processing .doc file: {e}")
         return None
     finally:
-        pythoncom.CoUninitialize()  # Uninitialize COM library
+        pythoncom.CoUninitialize()
 
 
 def translate_paragraph(paragraph, lang):
@@ -102,12 +98,21 @@ def translate_document(doc, lang):
                     translate_paragraph(paragraph, lang)
 
 
-def start_eureka_client():
+def start_eureka_client(port):
     """Start an Eureka client to register this service with the Eureka server."""
     eureka_client.init(eureka_server=os.getenv("EUREKA_SERVER"),
                        app_name=os.getenv("YOUR_APP_NAME"),
-                       instance_port=int(os.getenv("YOUR_INSTANCE_PORT")))
+                       instance_port=port)
+
 
 if __name__ == '__main__':
-    start_eureka_client()
-    app.run(debug=True, port = int(os.getenv("YOUR_INSTANCE_PORT")))
+    # Tasodifiy bo‘sh port olish
+    sock = socket.socket()
+    sock.bind(('', 0))  
+    port = sock.getsockname()[1]
+    sock.close()
+
+    start_eureka_client(port)  # Tasodifiy portni Eureka serverga ro‘yxatdan o‘tkazish
+
+    print(f"Server is running on port {port}")
+    app.run(debug=True, port=port)

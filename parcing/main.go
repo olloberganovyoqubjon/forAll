@@ -5,8 +5,8 @@ import (
 	"main/api/router"
 	"main/config"
 	db "main/db"
+	"net"
 	"os"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	eureka "github.com/xuanbo/eureka-client"
@@ -21,10 +21,18 @@ func init() {
 
 func main() {
 
-	port, err := strconv.Atoi(os.Getenv("PORT"))
+	// port, err := strconv.Atoi(os.Getenv("PORT"))
+	// if err != nil {
+	// 	panic("Could not convert port to integer")
+	// }
+
+	// Tasodifiy bo'sh port olish
+	listener, err := net.Listen("tcp", ":0")
 	if err != nil {
-		panic("Could not convert port to integer")
+		panic("Could not get a random port")
 	}
+	port := listener.Addr().(*net.TCPAddr).Port
+	listener.Close() // Portni bo'shatamiz
 
 	// Register with Eureka server
 	client := eureka.NewClient(&eureka.Config{
@@ -46,17 +54,7 @@ func main() {
 	client.Start()
 
 	r := gin.Default()
-	// r.Use(func(c *gin.Context) {
-	// c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-	// c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-	// c.Writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	// if c.Request.Method == "OPTIONS" {
-	// 	c.AbortWithStatus(http.StatusNoContent)
-	// 	return
-	// }
-	// c.Next()
-	// })
-
 	router.GetRoute(r)
+	// r.Run(fmt.Sprintf(":%d", port))
 	r.Run(fmt.Sprintf(":%d", port))
 }
