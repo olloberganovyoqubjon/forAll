@@ -36,8 +36,8 @@ public class ProgramController {
     }
 
     @GetMapping("/download/{softwareId}")
-    public HttpEntity<?> downloadSoftware(@PathVariable UUID softwareId, @RequestParam Long userId) throws IOException {
-        return programService.getProgram(softwareId, userId);
+    public HttpEntity<?> downloadSoftware(@PathVariable UUID softwareId, @CurrentUserId Long currentUserId) throws IOException {
+        return programService.getProgram(softwareId, currentUserId);
     }
 
     @GetMapping("/getAllSoftwares")
