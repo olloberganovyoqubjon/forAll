@@ -2,6 +2,8 @@ server:
   port: 8080  # Gateway uchun port
 
 spring:
+  main:
+    allow-circular-references: true
   application:
     name: gateway  # Gateway uchun application nomi
 
@@ -31,6 +33,7 @@ spring:
             - Path=/auth/**  # Auth servisi uchun yo'nalishlar
           filters:
             - RewritePath=/auth/(?<remaining>.*), /${remaining}  # /auth ni olib tashlaydi
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
 
         - id: appeal-service
           uri: lb://appeal  # Load balancer orqali appeal servisi
@@ -40,12 +43,13 @@ spring:
 #            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/appeal/(?<remaining>.*), /${remaining}  # /appeal ni olib tashlaydi
 
-        - id: python_translate-service
-          uri: lb://python_translate  # Load balancer orqali python-translate servisi
+        - id: python_translate
+          uri: http://localhost:5000  # Load balancer orqali python-translate servisi
+#          uri: lb://pythonTranslate  # Load balancer orqali python-translate servisi
           predicates:
             - Path=/python_translate/**  # Python_translate servisi uchun yo'nalishlar
           filters:
-#            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/python_translate/(?<remaining>.*), /${remaining}  # /python_translate ni olib tashlaydi
 
         - id: parsing-service
@@ -55,6 +59,14 @@ spring:
           filters:
             - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/parsing/(?<remaining>.*), /${remaining}  # /parsing ni olib tashlaydi
+
+        - id: appStore
+          uri: lb://appStore  # Load balancer orqali app_store servisi
+          predicates:
+              - Path=/appStore/**  # App_store servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/appStore/(?<remaining>.*), /${remaining}  # /app_store ni olib tashlaydi
 
 eureka:
   client:
@@ -66,3 +78,4 @@ eureka:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG  # Gateway loglari
+    org.springframework.web: DEBUG

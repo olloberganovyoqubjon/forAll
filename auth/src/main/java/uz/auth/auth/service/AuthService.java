@@ -62,7 +62,12 @@ public class AuthService implements UserDetailsService {
         if (tokenExpired) {
             return new ApiResult("Token expired or invalid!", false);
         }
-        return new ApiResult("Token success", true);
+        String usernameFromToken = jwtProvider.getUsernameFromToken(token);
+        Optional<Users> users = repository.findByUsername(usernameFromToken);
+        if (users.isEmpty()) {
+            return new ApiResult("User not find!", false);
+        }
+        return new ApiResult("Token success", true, null,new Object(),users.get().getId());
     }
 
 }

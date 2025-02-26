@@ -24,6 +24,8 @@ ext {
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.0.4'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-loadbalancer', version: '4.2.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 public class AuthController {
 
     /**
@@ -76,7 +79,9 @@ public class AuthController {
     public HttpEntity<?> validateToken(@RequestParam String token) {
         ApiResult apiResult = service.validateToken(token);
         if (apiResult.isSuccess()) {
-            return ResponseEntity.ok().build();
+            Map<String, Long> response = new HashMap<>();
+            response.put("userId", apiResult.getUserId()); // Haqiqiy userId qo'yiladi
+            return ResponseEntity.ok().body(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

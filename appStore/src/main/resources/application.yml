@@ -1,9 +1,9 @@
 server:
-  port: 0  # Auth server porti
+  port: 8082  # Auth server porti
 
 spring:
   application:
-    name: app_store  # Application nomi
+    name: appStore   # Application nomi
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/app_store
@@ -22,6 +22,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         use-new-id-generator-mappings: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 eureka:
   client:

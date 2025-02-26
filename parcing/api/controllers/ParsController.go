@@ -42,6 +42,14 @@ type InfList struct {
 	Category   Category  `json:"category"`
 }
 
+type PaginateResult struct {
+	InfList     []InfList
+	TotalPage   int
+	CountInf    int64
+	PerPage     int
+	CurrentPage int
+}
+
 type Content struct {
 	Content string `json:"content"`
 }
@@ -266,6 +274,7 @@ func GetNewsByIdSitesAndIdCategory(c *gin.Context) {
 	infsModel1 := []parsModels.Inf{}
 	var err error
 	idModel := parsModels.Inf{}
+	paginateResult := pagination.PaginateResult{}
 	db.ParsDB.Order("id desc").First(&idModel)
 	if idSite != "0" {
 		var categoryModels []parsModels.Category
@@ -281,23 +290,26 @@ func GetNewsByIdSitesAndIdCategory(c *gin.Context) {
 			}
 			params = append(params, category.ID)
 		}
-		_, err = pagination.Paginate(
+		paginateResult, err = pagination.Paginate(
 			db.ParsDB.Unscoped().
 				Order("create_date desc").
 				Where(categoryCondition, params...),
 			page,
-			20,
+			perPage,
 			nil,
 			&infsModel1,
 		)
+		// c.JSON(http.StatusOK, gin.H{
+		// 	"infsModel": pagination1,
+		// })
 		// _, err = pagination.Paginate(initializers.ParsDB.Unscoped().Order("id desc").Where(categoryModels).Where("create_date BETWEEN ? AND ?", idModel.Create_date.AddDate(0, 0, -1), idModel.Create_date), page, 5, nil, &infsModel1)
 		infsModel = append(infsModel, infsModel1...)
 		// }
 		rand.Shuffle(len(infsModel), func(i, j int) { infsModel[i], infsModel[j] = infsModel[j], infsModel[i] })
 	} else if idCategory == "0" {
-		_, err = pagination.Paginate(db.ParsDB.Unscoped().Order("create_date desc"), page, perPage, nil, &infsModel)
+		paginateResult, err = pagination.Paginate(db.ParsDB.Unscoped().Order("create_date desc"), page, perPage, nil, &infsModel)
 	} else {
-		_, err = pagination.Paginate(db.ParsDB.Unscoped().Order("create_date desc").Where("category_id = ?", idCategory), page, perPage, nil, &infsModel)
+		paginateResult, err = pagination.Paginate(db.ParsDB.Unscoped().Order("create_date desc").Where("category_id = ?", idCategory), page, perPage, nil, &infsModel)
 	}
 	if err != nil {
 		format_errors.InternalServerError(c)
@@ -305,7 +317,7 @@ func GetNewsByIdSitesAndIdCategory(c *gin.Context) {
 	}
 
 	InfsList := []InfList{}
-
+	//infsModel
 	for _, infModel := range infsModel {
 		var categoryModel parsModels.Category
 		db.ParsDB.First(&categoryModel, "id = ?", infModel.CategoryId).Order("ID")
@@ -331,8 +343,24 @@ func GetNewsByIdSitesAndIdCategory(c *gin.Context) {
 		InfsList = append(InfsList, InfList)
 	}
 
+	result := PaginateResult{
+		InfList:     InfsList,
+		TotalPage:   paginateResult.LastPage,
+		CountInf:    paginateResult.Total,
+		PerPage:     paginateResult.PerPage,
+		CurrentPage: paginateResult.CurrentPage,
+	}
+
+	// type PaginateResult struct {
+	// 	InfList     []InfList
+	// 	TotalPage   int32
+	// 	CountInf    int32
+	// 	PerPage     int32
+	// 	CurrentPage int32
+	// }
+
 	c.JSON(http.StatusOK, gin.H{
-		"infsModel": InfsList,
+		"infsModel": result,
 	})
 }
 

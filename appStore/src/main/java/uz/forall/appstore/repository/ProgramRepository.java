@@ -1,7 +1,9 @@
 package uz.forall.appstore.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.forall.appstore.entity.Program;
+import uz.forall.appstore.entity.Software;
 
-public interface ProgramRepository extends JpaRepository<Program, Long> {
+import java.util.UUID;
+
+public interface ProgramRepository extends JpaRepository<Software, UUID> {
 }

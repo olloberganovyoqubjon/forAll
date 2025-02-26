@@ -24,48 +24,43 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Configuration // Аннотация, указывающая, что это конфигурационный класс
-@EnableWebSecurity // Аннотация для включения веб-безопасности
-@EnableMethodSecurity // Аннотация для включения глобальной безопасности методов с пред- и пост-авторизацией
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecuryConfig implements WebMvcConfigurer {
 
-    /**
-     *
-     * Класс SecurityConfig является конфигурационным классом для настройки безопасности веб-приложения. Он реализует интерфейс WebMvcConfigurer.
-     * Этот класс управляет аутентификацией, авторизацией, фильтрацией запросов и шифрованием паролей, а также настройками CORS.
-     *
-     */
 
     @Lazy
-    @Autowired // Автосвязывание зависимостей
-    AuthService authService; // Сервис аутентификации
-    @Autowired // Автосвязывание зависимостей
-    JwtFilter jwtFilter; // Фильтр JWT
+    @Autowired
+    AuthService authService;
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // Метод конфигурации безопасности HTTP запросов
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Отключение защиты CSRF
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/sign-in", "/user/login","/user/logout","/auth/refreshToken**").permitAll()
                         .requestMatchers("/status").permitAll()
                         .requestMatchers("/getdiskspace").permitAll()
                         .requestMatchers("/getservertime").permitAll()
                         .requestMatchers("/auth/validate").permitAll()
-                        .anyRequest().authenticated() // Любой другой запрос должен быть аутентифицирован
+                        .requestMatchers("/validate").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(withDefaults()); // Использование базовой HTTP-аутентификации
+                .httpBasic(withDefaults());
 
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Adding JWT filter before UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(new CustomAuthenticationFilter(authenticationManager(http)), UsernamePasswordAuthenticationFilter.class); // Adding custom authentication filter
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Установка политики создания сессий - без сохранения состояния
-        http.cors(withDefaults()); // Включение CORS
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomAuthenticationFilter(authenticationManager(http)), UsernamePasswordAuthenticationFilter.class);
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.cors(withDefaults());
 
-        return http.build(); // Построение конфигурации безопасности
+        return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception { // Метод для создания бина AuthenticationManager
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(authService)
@@ -73,32 +68,23 @@ public class SecuryConfig implements WebMvcConfigurer {
         return authenticationManagerBuilder.build();
     }
 
-    /**
-     * Метод для создания бина PasswordEncoder для шифрования паролей
-     * @return PasswordEncoder
-     */
     @Bean
     PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Возврат шифровщика паролей BCrypt
+        return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Метод для создания бина PasswordValidator для проверки надежности паролей
-     */
+
     @Bean
     PasswordValidator passwordValidator(){
-        return new PasswordValidator(); // Возврат валидатора паролей
+        return new PasswordValidator();
     }
 
-    /**
-     * Метод для конфигурации CORS (переноса ресурсов между доменами)
-     * @param registry
-     */
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Разрешение CORS для всех путей
-                .allowedOrigins("*") // Разрешение запросов с любых источников
-                .allowedHeaders("*") // Разрешение любых заголовков
-                .allowedMethods("*"); // Разрешение любых методов (GET, POST, PUT и т.д.)
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedHeaders("*")
+                .allowedMethods("*");
     }
 }
