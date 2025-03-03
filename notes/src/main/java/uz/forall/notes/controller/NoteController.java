@@ -8,7 +8,7 @@ import uz.forall.notes.payload.NoteDto;
 import uz.forall.notes.service.NoteService;
 
 @RestController
-@RequestMapping("note")
+@RequestMapping
 public class NoteController {
 
     private final NoteService noteService;
@@ -18,21 +18,21 @@ public class NoteController {
     }
 
 
-    @PostMapping("add/{categoryId}/{userId}")
-    public HttpEntity<?> addNote(@RequestBody NoteDto noteDto, @PathVariable Long categoryId, @PathVariable Long userId) {
-        ApiResult apiResult = noteService.addNoteToCategory(noteDto, categoryId, userId);
+    @PostMapping("add")
+    public HttpEntity<?> addNote(@RequestBody NoteDto noteDto) {
+        ApiResult apiResult = noteService.addNoteToCategory(noteDto, 1L);
         return ResponseEntity.status(apiResult.isSuccess() ? 201 : 409).body(apiResult);
     }
 
-    @PutMapping("edit/{noteId}/{userId}")
-    public HttpEntity<?> editNote(@RequestBody NoteDto noteDto, @PathVariable Long noteId, @PathVariable Long userId) {
-        ApiResult apiResult = noteService.editNoteToCategory(noteDto, noteId, userId);
+    @PutMapping("edit/{noteId}")
+    public HttpEntity<?> editNote(@RequestBody NoteDto noteDto, @PathVariable Long noteId) {
+        ApiResult apiResult = noteService.editNoteToCategory(noteDto, noteId, 1L);
         return ResponseEntity.status(apiResult.isSuccess() ? 202 : 409).body(apiResult);
     }
 
-    @DeleteMapping("delete/{noteId}/{userId}")
-    public HttpEntity<?> deleteNote(@PathVariable Long noteId, @PathVariable Long userId) {
-        ApiResult apiResult = noteService.deleteNoteToCategory(noteId, userId);
+    @DeleteMapping("delete/{noteId}")
+    public HttpEntity<?> deleteNote(@PathVariable Long noteId) {
+        ApiResult apiResult = noteService.deleteNoteToCategory(noteId, 1L);
         return ResponseEntity.status(apiResult.isSuccess() ? 202 : 409).body(apiResult);
     }
 
@@ -48,9 +48,9 @@ public class NoteController {
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 
-    @GetMapping("allNotes/{userId}")
-    public HttpEntity<?> getAllNotes(@PathVariable Long userId) {
-        ApiResult apiResult = noteService.getNotesToUser(userId);
+    @GetMapping("allNotes")
+    public HttpEntity<?> getAllNotes() {
+        ApiResult apiResult = noteService.getNotesToUser(1L);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 

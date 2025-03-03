@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.util.Date;
+
 
 @Entity
 @AllArgsConstructor
@@ -16,10 +17,15 @@ public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    private Category category;
+    private Boolean allDay;
     private String title;
-    private String content;
-    private Timestamp createdDate;
-    private Timestamp termDate;
+    private String description;
+    private String color;
+    @Column(name = "start_date")
+    private Date start;
+    @Column(name = "end_date")
+    private Date end;
+
+    @ManyToOne
+    private User user;
 }
