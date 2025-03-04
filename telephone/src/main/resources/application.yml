@@ -1,7 +1,8 @@
 server:
-  port: 0  # Auth server porti
+  port: 8086  # Auth server porti
 
 spring:
+
   application:
     name: telephone  # Application nomi
   datasource:
@@ -22,9 +23,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         use-new-id-generator-mappings: true
-  data:
-    rest:
-      base-path: /api
 
 eureka:
   client:
