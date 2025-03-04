@@ -9,12 +9,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProgramDto {
 
+    private UUID id;
     private String name; // Dastur nomi
     private String description; // Dastur haqida qisqacha ma'lumot
     private String mainFile; // Asosiy ishga tushiriladigan fayl nomi
@@ -23,6 +25,6 @@ public class ProgramDto {
     @Lob
     private byte[] icon; // Dastur rasmi
 
-    @ElementCollection
-    private List<Map<String, String>> files; // Papkada saqlangan barcha fayllar
+    @Lob
+    private byte[] file; // dastur fayli
 }

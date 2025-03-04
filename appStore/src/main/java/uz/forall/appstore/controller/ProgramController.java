@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("program")
-@CrossOrigin(origins = "*")
+@RequestMapping
 public class ProgramController {
 
     private final ProgramService programService;
@@ -29,20 +28,20 @@ public class ProgramController {
             @RequestParam String mainFile,
             @RequestParam String version,
             @RequestParam MultipartFile icon,
-            @RequestParam MultipartFile[] files) throws IOException {
+            @RequestParam MultipartFile file) throws IOException {
 
-        ApiResult apiResult = programService.saveSoftware(name, description, mainFile, version, icon, files);
+        ApiResult apiResult = programService.saveSoftware(name, description, mainFile, version, icon, file);
         return ResponseEntity.ok(apiResult);
     }
 
     @GetMapping("/download/{softwareId}")
-    public HttpEntity<?> downloadSoftware(@PathVariable UUID softwareId, @CurrentUserId Long currentUserId) throws IOException {
-        return programService.getProgram(softwareId, currentUserId);
+    public HttpEntity<?> downloadSoftware(@PathVariable UUID softwareId) throws IOException {
+        return programService.getProgram(softwareId);
     }
 
-    @GetMapping("/getAllSoftwares")
-    public HttpEntity<?> getAllSoftwares(@CurrentUserId Long userId){
-        ApiResult apiResult = programService.getAllSoftware(userId);
+    @GetMapping("/getAllSoftware")
+    public HttpEntity<?> getAllSoftware(){
+        ApiResult apiResult = programService.getAllSoftware();
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 }

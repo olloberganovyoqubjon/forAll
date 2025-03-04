@@ -68,6 +68,25 @@ spring:
             - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/appStore/(?<remaining>.*), /${remaining}  # /app_store ni olib tashlaydi
 
+
+        - id: notes
+          uri: lb://notes  # Load balancer orqali notes servisi
+          predicates:
+              - Path=/notes/**  # Notes servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/notes/(?<remaining>.*), /${remaining}  # /notes ni olib tashlaydi
+
+
+        - id: telephone
+          uri: lb://telephone  # Load balancer orqali telephone servisi
+          predicates:
+              - Path=/telephone/**  # Telephone servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/telephone/(?<remaining>.*), /${remaining}  # /telephone ni olib tashlaydi
+
+
 eureka:
   client:
     service-url:

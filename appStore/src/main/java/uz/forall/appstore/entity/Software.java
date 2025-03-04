@@ -27,6 +27,9 @@ public class Software {
     @Lob
     private byte[] icon; // Dastur rasmi
 
+    @Lob
+    private byte[] file;
+
     private String version; // Dastur versiyasi
 }
 

@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth.main.iml" filepath="$PROJECT_DIR$/.idea/modules/auth.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/forAll.iml" filepath="$PROJECT_DIR$/.idea/forAll.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/library.main.iml" filepath="$PROJECT_DIR$/.idea/modules/library.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/telephone.main.iml" filepath="$PROJECT_DIR$/.idea/modules/telephone.main.iml" />
     </modules>
   </component>
 </project>

@@ -24,7 +24,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/user/login", "/auth/validate",
             "/parsing/presidentNews", "/parsing/wether", "/parsing/uploadPars", "/parsing/rade", "/parsing/newsByIdSites", "/parsing/allSitesWithCategory", "/parsing/newsByIdSite"
-            ,"/python_translate/text", "/python_translate/upload/"
+            ,"/python_translate/text", "/python_translate/upload/",
+            "/notes",
+            "/appStore",
+            "/telephone"
     );
 
     public AuthenticationFilter() {

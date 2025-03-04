@@ -10,15 +10,9 @@ import java.io.File;
 @EnableDiscoveryClient
 public class AppStoreApplication {
 
-    public static final String uploadDir = "files/appstore";
-
     public static void main(String[] args) {
 
         SpringApplication.run(AppStoreApplication.class, args);
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs(); // Agar uploads papkasi mavjud bo'lmasa, uni yaratamiz
-        }
     }
 
 }
