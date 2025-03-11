@@ -16,11 +16,7 @@ public class VideoController {
         this.videoService = videoService;
     }
 
-    @GetMapping("analyze/{categoryId}")
-    public HttpEntity<?> analyzeVideo(@PathVariable Long categoryId) {
-        ApiResult apiResult = videoService.analyzeVideo(categoryId);
-        return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
-    }
+
 
     @GetMapping("videos/{categoryId}")
     public HttpEntity<?> getVideos(

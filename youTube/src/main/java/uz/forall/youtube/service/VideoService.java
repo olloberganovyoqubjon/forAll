@@ -29,42 +29,18 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import static uz.forall.youtube.YouTubeApplication.folderPath;
+
 @Service
 public class VideoService {
 
-    String folderPath = "E:/videos";
-
     private final VideoRepository videoRepository;
-    private final CategoryRepository categoryRepository;
 
-    public VideoService(VideoRepository videoRepository, CategoryRepository categoryRepository) {
+    public VideoService(VideoRepository videoRepository) {
         this.videoRepository = videoRepository;
-        this.categoryRepository = categoryRepository;
     }
 
-    public ApiResult analyzeVideo(Long categoryId) {
-        File folder = new File(folderPath);
-        if (folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
 
-            if (files != null && files.length > 0) {
-                System.out.println("MP4 fayllar ro'yxati:");
-                for (File file : files) {
-                    Optional<Video> optionalVideo = videoRepository.findVideoByTitle(file.getName());
-                    if (optionalVideo.isEmpty()) {
-                        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
-                        if (optionalCategory.isEmpty()) return new ApiResult("Kategoriya topilmadi", false);
-                        videoRepository.save(new Video(null, file.getName(), optionalCategory.get()));
-                    }
-                }
-            } else {
-                return new ApiResult("MP4 fayllari mavjud emas", false);
-            }
-        } else {
-            return new ApiResult("Bunday papka mavjud emas", false);
-        }
-        return new ApiResult("Video analiz qilindi", true);
-    }
 
     public ApiResult getVideos(Long categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -82,7 +58,7 @@ public class VideoService {
             for (Video video : videoPage.getContent()) {
                 String title = video.getTitle().substring(0, video.getTitle().length() - 4);
                 title = title + ".webp";
-                Path path = Paths.get(folderPath).resolve(title).normalize();
+                Path path = Paths.get(folderPath).resolve(video.getCategory().getName()).resolve(title).normalize();
 
                 String base64String = "";
                 if (Files.exists(path)) { // Fayl mavjudligini tekshirish
@@ -114,7 +90,7 @@ public class VideoService {
             }
 
             String fileName = optionalVideo.get().getTitle();
-            Path filePath = Paths.get(folderPath).resolve(fileName).normalize();
+            Path filePath = Paths.get(folderPath).resolve(optionalVideo.get().getCategory().getName()).resolve(fileName).normalize();
             File file = filePath.toFile();
 
             if (!file.exists() || !file.canRead()) {
