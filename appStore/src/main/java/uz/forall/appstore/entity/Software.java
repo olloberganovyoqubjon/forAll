@@ -31,5 +31,11 @@ public class Software {
     private byte[] file;
 
     private String version; // Dastur versiyasi
+
+    private Boolean isDesktop = false;
+
+    private Boolean isStartup = false;
+
+    private Boolean isAutoStart = false;
 }
 

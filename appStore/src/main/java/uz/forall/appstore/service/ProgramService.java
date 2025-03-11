@@ -49,7 +49,7 @@ public class ProgramService {
         return ResponseEntity.ok(programDto);
     }
 
-    public ApiResult saveSoftware(String name, String description, String mainFile, String version, MultipartFile multipartIcon, MultipartFile multipartFile) throws IOException {
+    public ApiResult saveSoftware(String name, String description, String mainFile, String version, MultipartFile multipartIcon, MultipartFile multipartFile, Boolean isDesktop, Boolean isStartup, Boolean isAutoStart) throws IOException {
 
         // Dasturni saqlash
         Software software = Software.builder()
@@ -59,6 +59,9 @@ public class ProgramService {
                 .version(version)
                 .icon(multipartIcon.getBytes())
                 .file(multipartFile.getBytes())
+                .isDesktop(isDesktop)
+                .isStartup(isStartup)
+                .isAutoStart(isAutoStart)
                 .build();
         programRepository.save(software);
         return new ApiResult("Dastur muvaffaqiyatli saqlandi!", true);
@@ -74,5 +77,10 @@ public class ProgramService {
         }
 
         return new ApiResult("Barcha dasturlar", true, allProgramResponses);
+    }
+
+    public ApiResult deleteSoftware(UUID softwareId) {
+        programRepository.deleteById(softwareId);
+        return new ApiResult("Dastur muvaffaqiyatli o'chirildi!", true);
     }
 }

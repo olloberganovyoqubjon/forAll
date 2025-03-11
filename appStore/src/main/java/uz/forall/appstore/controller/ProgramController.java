@@ -28,9 +28,13 @@ public class ProgramController {
             @RequestParam String mainFile,
             @RequestParam String version,
             @RequestParam MultipartFile icon,
-            @RequestParam MultipartFile file) throws IOException {
+            @RequestParam MultipartFile file,
+            @RequestParam Boolean isDesktop,
+            @RequestParam Boolean isStartup,
+            @RequestParam Boolean isAutoStart
+            ) throws IOException {
 
-        ApiResult apiResult = programService.saveSoftware(name, description, mainFile, version, icon, file);
+        ApiResult apiResult = programService.saveSoftware(name, description, mainFile, version, icon, file, isDesktop, isStartup, isAutoStart);
         return ResponseEntity.ok(apiResult);
     }
 
@@ -42,6 +46,12 @@ public class ProgramController {
     @GetMapping("/getAllSoftware")
     public HttpEntity<?> getAllSoftware(){
         ApiResult apiResult = programService.getAllSoftware();
+        return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
+    }
+
+    @DeleteMapping("/delete/{softwareId}")
+    public HttpEntity<?> deleteSoftware(@PathVariable UUID softwareId){
+        ApiResult apiResult = programService.deleteSoftware(softwareId);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 }

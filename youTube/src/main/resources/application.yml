@@ -1,12 +1,18 @@
 server:
   port: 0  # Auth server porti
+  tomcat:
+    max-http-form-post-size: 50MB # Maksimal HTTP POST so‘rov hajmi
+    max-swallow-size: 50MB        # Maksimal swallow buffer
+  undertow:
+    buffer-size: 1024             # Undertow buffer o‘lchami
+    direct-buffers: true          # Direct buffer'larni yoqish
 
 spring:
   application:
     name: youTube  # Application nomi
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/youTube
+    url: jdbc:postgresql://localhost:5432/youtube
     username: postgres
     password: 1
     hikari:
@@ -25,6 +31,10 @@ spring:
   data:
     rest:
       base-path: /api
+  servlet:
+    multipart:
+      max-file-size: 100MB         # Maksimal yuklanadigan fayl hajmi
+      max-request-size: 100MB      # Maksimal so‘rov hajmi
 
 eureka:
   client:

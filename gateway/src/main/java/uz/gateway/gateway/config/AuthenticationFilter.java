@@ -27,7 +27,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ,"/python_translate/text", "/python_translate/upload/",
             "/notes",
             "/appStore",
-            "/telephone"
+            "/telephone",
+            "/youTube"
     );
 
     public AuthenticationFilter() {
