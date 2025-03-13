@@ -39,6 +39,7 @@ dependencies {
 	implementation 'org.bytedeco:javacv:1.5.9'
 	implementation 'com.google.code.gson:gson:2.9.0'
 	implementation group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.11'
+	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
 }
 
 dependencyManagement {

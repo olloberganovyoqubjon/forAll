@@ -10,12 +10,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static uz.forall.youtube.YouTubeApplication.FOLDER_PATH;
+
 public class VideoToImageConverter {
 
-    public static void save(String videoName, String path) {
+    public static void save(String videoName) {
         try {
-            Path inputVideoPath = Paths.get(path).resolve(videoName).normalize();
-            String outputImagePath = path + videoName.substring(0, videoName.length() - 4) + ".png";
+            Path inputVideoPath = Paths.get(FOLDER_PATH).resolve(videoName).normalize();
+            String outputImagePath = FOLDER_PATH + videoName.substring(0, videoName.length() - 4) + ".png";
             FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputVideoPath.toString());
             grabber.start();
 
@@ -32,8 +34,6 @@ public class VideoToImageConverter {
 
                 // PNG formatida saqlash
                 ImageIO.write(bufferedImage, "png", outputFile);
-
-                System.out.println("Rasm saqlandi: " + outputImagePath);
             }
 
             grabber.stop();

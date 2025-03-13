@@ -10,11 +10,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uz.forall.youtube.entity.Category;
 import uz.forall.youtube.entity.Video;
 import uz.forall.youtube.payload.ApiResult;
 import uz.forall.youtube.payload.VideoDto;
-import uz.forall.youtube.repository.CategoryRepository;
 import uz.forall.youtube.repository.VideoRepository;
 
 import java.io.File;
@@ -29,7 +27,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import static uz.forall.youtube.YouTubeApplication.folderPath;
+import static uz.forall.youtube.YouTubeApplication.FOLDER_PATH;
 
 @Service
 public class VideoService {
@@ -39,7 +37,6 @@ public class VideoService {
     public VideoService(VideoRepository videoRepository) {
         this.videoRepository = videoRepository;
     }
-
 
 
     public ApiResult getVideos(Long categoryId, int page, int size) {
@@ -52,34 +49,53 @@ public class VideoService {
         }
 
         // DTO lar uchun bo'sh ro'yxat yaratamiz
+        Page<VideoDto> videoDtos = getVidePage(videoPage, pageable);
+
+        return new ApiResult("Video ro'yxati", true, videoDtos);
+    }
+
+
+    private Page<VideoDto> getVidePage(Page<Video> videoPage, Pageable pageable) {
         List<VideoDto> videoDtoList = new ArrayList<>();
 
         if (!videoPage.isEmpty()) {
             for (Video video : videoPage.getContent()) {
                 String title = video.getTitle().substring(0, video.getTitle().length() - 4);
-                title = title + ".webp";
-                Path path = Paths.get(folderPath).resolve(video.getCategory().getName()).resolve(title).normalize();
+                String webpTitle = title + ".webp";
+                Path webpPath = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(webpTitle).normalize();
 
+
+                String pngTitle = title + ".webp";
+                Path pngPath = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(pngTitle).normalize();
+
+                boolean webp = false;
                 String base64String = "";
-                if (Files.exists(path)) { // Fayl mavjudligini tekshirish
+                if (Files.exists(webpPath)) { // Fayl mavjudligini tekshirish
                     try {
-                        byte[] imageBytes = Files.readAllBytes(path);
+                        byte[] imageBytes = Files.readAllBytes(webpPath);
                         base64String = Base64.getEncoder().encodeToString(imageBytes);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    webp = true;
+                } else if (Files.exists(pngPath)) { // Fayl mavjudligini tekshirish
+                    try {
+                        byte[] imageBytes = Files.readAllBytes(pngPath);
+                        base64String = Base64.getEncoder().encodeToString(imageBytes);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    webp = false;
                 }
-
                 // DTO ni yaratamiz va ro'yxatga qo'shamiz
-                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String);
+                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String, webp);
                 videoDtoList.add(videoDto);
             }
         }
 
         // Yangi sahifalanadigan Page<VideoDto> yaratamiz
         Page<VideoDto> videoDtos = new PageImpl<>(videoDtoList, pageable, videoPage.getTotalElements());
-
-        return new ApiResult("Video ro'yxati", true, videoDtos);
+        return videoDtos;
     }
 
     public ResponseEntity<Resource> getVideo(Long id, String rangeHeader) {
@@ -90,7 +106,7 @@ public class VideoService {
             }
 
             String fileName = optionalVideo.get().getTitle();
-            Path filePath = Paths.get(folderPath).resolve(optionalVideo.get().getCategory().getName()).resolve(fileName).normalize();
+            Path filePath = Paths.get(FOLDER_PATH).resolve(optionalVideo.get().getCategory().getName()).resolve(fileName).normalize();
             File file = filePath.toFile();
 
             if (!file.exists() || !file.canRead()) {
@@ -137,4 +153,38 @@ public class VideoService {
         }
     }
 
+    public ApiResult getVideosPlaylist(Long playlistId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Video> videoPage = videoRepository.findAllByPlaylist_Id(playlistId, pageable);
+//
+//        // DTO lar uchun bo'sh ro'yxat yaratamiz
+//        List<VideoDto> videoDtoList = new ArrayList<>();
+//
+//        if (!videoPage.isEmpty()) {
+//            for (Video video : videoPage.getContent()) {
+//                String title = video.getTitle().substring(0, video.getTitle().length() - 4);
+//                title = title + ".webp";
+//                Path path = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(title).normalize();
+//
+//                String base64String = "";
+//                if (Files.exists(path)) { // Fayl mavjudligini tekshirish
+//                    try {
+//                        byte[] imageBytes = Files.readAllBytes(path);
+//                        base64String = Base64.getEncoder().encodeToString(imageBytes);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                // DTO ni yaratamiz va ro'yxatga qo'shamiz
+//                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String);
+//                videoDtoList.add(videoDto);
+//            }
+//        }
+        Page<VideoDto> videoDtos = getVidePage(videoPage, pageable);
+        // Yangi sahifalanadigan Page<VideoDto> yaratamiz
+//        Page<VideoDto> videoDtos = new PageImpl<>(videoDtoList, pageable, videoPage.getTotalElements());
+
+        return new ApiResult("Video ro'yxati", true, videoDtos);
+    }
 }

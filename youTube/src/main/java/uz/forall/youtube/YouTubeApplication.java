@@ -7,10 +7,10 @@ import uz.forall.youtube.helper.ConfigReader;
 @SpringBootApplication
 public class YouTubeApplication {
 
-	public static String folderPath = "";
+	public static String FOLDER_PATH = "";
 
 	public static void main(String[] args) {
-		folderPath = ConfigReader.readConfigFileToString("folder");
+		FOLDER_PATH = ConfigReader.readConfigFileToString("folder");
 		SpringApplication.run(YouTubeApplication.class, args);
 
 

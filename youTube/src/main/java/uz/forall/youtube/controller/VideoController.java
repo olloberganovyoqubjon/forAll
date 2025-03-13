@@ -31,4 +31,14 @@ public class VideoController {
     public HttpEntity<?> getVideo(@PathVariable Long id, @RequestHeader(value = "Range", required = false) String rangeHeader) {
         return videoService.getVideo(id, rangeHeader);
     }
+
+    @GetMapping("video/playlist/{playlistId}")
+    public HttpEntity<?> getVideosPlaylist(
+            @PathVariable Long playlistId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        ApiResult apiResult = videoService.getVideosPlaylist(playlistId,page,size);
+        return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
+    }
 }

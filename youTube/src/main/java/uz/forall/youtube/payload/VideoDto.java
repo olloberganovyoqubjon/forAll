@@ -14,4 +14,6 @@ public class VideoDto {
     private String title;
 
     private String bytes;
+
+    private Boolean webp;
 }
