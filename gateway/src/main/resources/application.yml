@@ -105,7 +105,7 @@ spring:
           args:
             maxSize: 10GB
   codec:
-    max-in-memory-size: 1GB
+    max-in-memory-size: 5GB
 
 
 eureka:

@@ -1,10 +1,10 @@
 server:
-  port: 0  # Auth server porti
+  port: 8082  # Auth server porti
   tomcat:
-    max-http-form-post-size: 50MB # Maksimal HTTP POST so‘rov hajmi
-    max-swallow-size: 50MB        # Maksimal swallow buffer
+    max-http-form-post-size: -1 # Maksimal HTTP POST so‘rov hajmi
+    max-swallow-size: -1        # Maksimal swallow buffer
   undertow:
-    buffer-size: 1024             # Undertow buffer o‘lchami
+    buffer-size: 65536             # Undertow buffer o‘lchami
     direct-buffers: true          # Direct buffer'larni yoqish
 
 spring:

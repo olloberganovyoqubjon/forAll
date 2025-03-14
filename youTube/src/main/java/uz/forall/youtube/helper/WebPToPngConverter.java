@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static uz.forall.youtube.YouTubeApplication.FOLDER_PATH;
+import static uz.forall.youtube.helper.SeeTheTime.FOLDER_PATH;
+
 
 public class WebPToPngConverter {
     public static void save(String fileName) {

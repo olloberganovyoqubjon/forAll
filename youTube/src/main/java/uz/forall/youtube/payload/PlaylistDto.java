@@ -7,15 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoDto {
+public class PlaylistDto {
 
-    private Long id;
-
-    private String title;
-
-    private String bytes;
-
-    private Boolean webp;
-
-    private Boolean playlist;
+    private Integer count;
+    private String name;
 }

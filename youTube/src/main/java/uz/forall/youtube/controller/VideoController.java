@@ -41,4 +41,14 @@ public class VideoController {
         ApiResult apiResult = videoService.getVideosPlaylist(playlistId,page,size);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
+
+    @GetMapping("video/search/{search}")
+    public HttpEntity<?> searchVideo(
+            @PathVariable String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        ApiResult apiResult = videoService.searchVideo(search, page, size);
+        return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
+    }
 }

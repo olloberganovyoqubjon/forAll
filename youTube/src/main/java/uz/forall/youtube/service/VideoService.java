@@ -10,9 +10,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uz.forall.youtube.entity.Playlist;
 import uz.forall.youtube.entity.Video;
+import uz.forall.youtube.helper.SeeTheTime;
 import uz.forall.youtube.payload.ApiResult;
+import uz.forall.youtube.payload.PlaylistDto;
 import uz.forall.youtube.payload.VideoDto;
+import uz.forall.youtube.repository.CategoryRepository;
+import uz.forall.youtube.repository.PlaylistRepository;
 import uz.forall.youtube.repository.VideoRepository;
 
 import java.io.File;
@@ -22,32 +27,48 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static uz.forall.youtube.YouTubeApplication.FOLDER_PATH;
+import static uz.forall.youtube.helper.SeeTheTime.FOLDER_PATH;
 
 @Service
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final PlaylistRepository playlistRepository;
+    private final CategoryRepository categoryRepository;
 
-    public VideoService(VideoRepository videoRepository) {
+    public VideoService(VideoRepository videoRepository, PlaylistRepository playlistRepository, CategoryRepository categoryRepository) {
         this.videoRepository = videoRepository;
+        this.playlistRepository = playlistRepository;
+        this.categoryRepository = categoryRepository;
     }
 
 
-    public ApiResult getVideos(Long categoryId, int page, int size) {
+    public ApiResult getVideos(Long idCategory, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Video> videoPage;
-        if (categoryId == 0)
-            videoPage = videoRepository.findAll(pageable);
-        else {
-            videoPage = videoRepository.findAllByCategory_Id(categoryId, pageable);
-        }
+        List<Video> videoList;
+        if (idCategory == 0) {
+            if (SeeTheTime.permissionVideo()) {
+                List<Long> blockedCategories = new ArrayList<>();
+                categoryRepository.findAll().forEach(category -> {
+                    if (category.getBlocked()) {
+                        blockedCategories.add(category.getId());
+                    }
+                });
 
+                videoList = videoRepository.findAllByNotBlockedWithPlaylist(blockedCategories, pageable);
+
+                // PageImpl orqali Page formatiga o‘tkazamiz
+
+            } else {
+                videoList = videoRepository.findAllByPlaylist(pageable);
+            }
+        } else {
+            videoList = videoRepository.findAllByCategory_Id(idCategory, pageable);
+        }
+        videoPage = new PageImpl<>(videoList, pageable, videoList.size());
         // DTO lar uchun bo'sh ro'yxat yaratamiz
         Page<VideoDto> videoDtos = getVidePage(videoPage, pageable);
 
@@ -62,11 +83,10 @@ public class VideoService {
             for (Video video : videoPage.getContent()) {
                 String title = video.getTitle().substring(0, video.getTitle().length() - 4);
                 String webpTitle = title + ".webp";
-                Path webpPath = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(webpTitle).normalize();
+                Path webpPath = Paths.get(FOLDER_PATH).resolve(webpTitle).normalize();
 
-
-                String pngTitle = title + ".webp";
-                Path pngPath = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(pngTitle).normalize();
+                String pngTitle = title + ".png";
+                Path pngPath = Paths.get(FOLDER_PATH).resolve(pngTitle).normalize();
 
                 boolean webp = false;
                 String base64String = "";
@@ -85,10 +105,18 @@ public class VideoService {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    webp = false;
+                } else {
+                    try {
+                        byte[] imageBytes = Files.readAllBytes(Paths.get("youtube.png"));
+                        base64String = Base64.getEncoder().encodeToString(imageBytes);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                boolean playlist = video.getPlaylist() != null;
                 // DTO ni yaratamiz va ro'yxatga qo'shamiz
-                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String, webp);
+                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String, webp, playlist);
                 videoDtoList.add(videoDto);
             }
         }
@@ -105,8 +133,14 @@ public class VideoService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
 
+            if (optionalVideo.get().getCategory().getBlocked()){
+                if (!SeeTheTime.permissionVideo()){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+            }
+
             String fileName = optionalVideo.get().getTitle();
-            Path filePath = Paths.get(FOLDER_PATH).resolve(optionalVideo.get().getCategory().getName()).resolve(fileName).normalize();
+            Path filePath = Paths.get(FOLDER_PATH).resolve(fileName).normalize();
             File file = filePath.toFile();
 
             if (!file.exists() || !file.canRead()) {
@@ -154,37 +188,28 @@ public class VideoService {
     }
 
     public ApiResult getVideosPlaylist(Long playlistId, int page, int size) {
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+        if (optionalPlaylist.isEmpty()) {
+            return new ApiResult("Playlist topilmadi", false, null);
+        }
+        Integer countByPlaylistId = videoRepository.countByPlaylist_Id(playlistId);
+        PlaylistDto playlistDto = new PlaylistDto(countByPlaylistId, optionalPlaylist.get().getName());
         Pageable pageable = PageRequest.of(page, size);
         Page<Video> videoPage = videoRepository.findAllByPlaylist_Id(playlistId, pageable);
-//
-//        // DTO lar uchun bo'sh ro'yxat yaratamiz
-//        List<VideoDto> videoDtoList = new ArrayList<>();
-//
-//        if (!videoPage.isEmpty()) {
-//            for (Video video : videoPage.getContent()) {
-//                String title = video.getTitle().substring(0, video.getTitle().length() - 4);
-//                title = title + ".webp";
-//                Path path = Paths.get(FOLDER_PATH).resolve(video.getCategory().getName()).resolve(title).normalize();
-//
-//                String base64String = "";
-//                if (Files.exists(path)) { // Fayl mavjudligini tekshirish
-//                    try {
-//                        byte[] imageBytes = Files.readAllBytes(path);
-//                        base64String = Base64.getEncoder().encodeToString(imageBytes);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                // DTO ni yaratamiz va ro'yxatga qo'shamiz
-//                VideoDto videoDto = new VideoDto(video.getId(), video.getTitle(), base64String);
-//                videoDtoList.add(videoDto);
-//            }
-//        }
         Page<VideoDto> videoDtos = getVidePage(videoPage, pageable);
-        // Yangi sahifalanadigan Page<VideoDto> yaratamiz
-//        Page<VideoDto> videoDtos = new PageImpl<>(videoDtoList, pageable, videoPage.getTotalElements());
 
-        return new ApiResult("Video ro'yxati", true, videoDtos);
+        return new ApiResult("Video ro'yxati", true, videoDtos, playlistDto, null);
+    }
+
+    public ApiResult searchVideo(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Video> videoList;
+        if (SeeTheTime.permissionVideo())
+            videoList = videoRepository.findAllByTitleContainingAndBlocked(search);
+        else
+            videoList = videoRepository.findAllByTitleContainingIgnoreCase(search);
+        Page<Video> videoPage = new PageImpl<>(videoList, pageable, videoList.size());
+        Page<VideoDto> videoDtos = getVidePage(videoPage, pageable);
+        return new ApiResult("Video ro'yxati", true, videoDtos, null, null);
     }
 }

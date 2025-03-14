@@ -1,0 +1,19 @@
+{
+  "folder": "E:/videos1/",  //-|-->video saqlash joyi
+
+  "morgenCloseHorse":9,     //-|
+  "morgenCloseMin": 0,      //-|-->ertalabki ochilish vaqti
+  "morgenCloseSec": 0,      //-|
+
+  "dayOpenHorse":12,        //-|
+  "dayOpenMin": 0,          //-|-->tushlikdagi yopilish vaqti
+  "dayOpenSec": 0,          //-|
+
+  "dayCloseHorse":14,       //-|
+  "dayCloseMin": 0,         //-|-->tushlikdagi ochilish vaqti
+  "dayCloseSec": 0,         //-|
+
+  "nightOpenHorse":18,      //-|
+  "nightOpenMin": 0,        //-|-->kechgi yopilish vaqti
+  "nightOpenSec": 0         //-|
+}
