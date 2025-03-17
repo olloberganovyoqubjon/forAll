@@ -2,9 +2,8 @@ package uz.forall.youtube.controller;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uz.forall.youtube.entity.Playlist;
 import uz.forall.youtube.payload.ApiResult;
 import uz.forall.youtube.service.PlaylistService;
 
@@ -23,4 +22,11 @@ public class PlaylistController {
         ApiResult apiResult = playlistService.getPlayList();
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
+
+    @GetMapping("category/{categoryId}")
+    public HttpEntity<?> getPlaylists(@PathVariable Long categoryId) {
+        ApiResult apiResult = playlistService.getPlaylistsFromCategory(categoryId);
+        return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
+    }
+
 }
