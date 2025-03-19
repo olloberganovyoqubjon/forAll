@@ -73,7 +73,7 @@ public class ProgramService {
         for (Software software : programRepositoryAll) {
             allProgramResponses.add(
                     new AllProgramResponse(
-                            software.getId(), software.getName(), software.getDescription(), software.getMainFile(), software.getIcon(), software.getVersion()));
+                            software.getId(), software.getName(), software.getDescription(), software.getMainFile(), software.getIcon(), software.getVersion(), software.getIsDesktop(),software.getIsStartup(), software.getIsAutoStart()));
         }
 
         return new ApiResult("Barcha dasturlar", true, allProgramResponses);
@@ -82,5 +82,24 @@ public class ProgramService {
     public ApiResult deleteSoftware(UUID softwareId) {
         programRepository.deleteById(softwareId);
         return new ApiResult("Dastur muvaffaqiyatli o'chirildi!", true);
+    }
+
+    public ApiResult updateSoftware(UUID id, String name, String description, String mainFile, String version, MultipartFile icon, MultipartFile file, Boolean isDesktop, Boolean isStartup, Boolean isAutoStart) throws IOException {
+
+        // Dasturni saqlash
+        Software software = Software.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .mainFile(mainFile)
+                .version(version)
+                .icon(icon.getBytes())
+                .file(file.getBytes())
+                .isDesktop(isDesktop)
+                .isStartup(isStartup)
+                .isAutoStart(isAutoStart)
+                .build();
+        programRepository.save(software);
+        return new ApiResult("Dastur muvaffaqiyatli o'zgartirildi!", true);
     }
 }

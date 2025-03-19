@@ -38,6 +38,24 @@ public class ProgramController {
         return ResponseEntity.ok(apiResult);
     }
 
+    @PutMapping("/update/{id}")
+    public HttpEntity<?> updateSoftware(
+            @PathVariable UUID id,
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam String mainFile,
+            @RequestParam String version,
+            @RequestParam MultipartFile icon,
+            @RequestParam MultipartFile file,
+            @RequestParam Boolean isDesktop,
+            @RequestParam Boolean isStartup,
+            @RequestParam Boolean isAutoStart
+            ) throws IOException {
+
+        ApiResult apiResult = programService.updateSoftware(id, name, description, mainFile, version, icon, file, isDesktop, isStartup, isAutoStart);
+        return ResponseEntity.ok(apiResult);
+    }
+
     @GetMapping("/download/{softwareId}")
     public HttpEntity<?> downloadSoftware(@PathVariable UUID softwareId) throws IOException {
         return programService.getProgram(softwareId);

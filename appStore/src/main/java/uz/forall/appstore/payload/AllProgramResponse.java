@@ -18,4 +18,9 @@ public class AllProgramResponse {
     private String mainFile; // Asosiy ishga tushiriladigan fayl nomi
     private byte[] icon; // Dastur rasmi
     private String version; // Dastur versiyasi
+    private Boolean isDesktop;
+
+    private Boolean isStartup;
+
+    private Boolean isAutoStart;
 }

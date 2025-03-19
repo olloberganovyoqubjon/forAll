@@ -22,6 +22,7 @@ spring:
                 - "http://localhost:3000"       # Barcha originlarga ruxsat berish
                 - "http://localhost:3001"
                 - "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
+                - "http://192.168.10.181:3001"  # Barcha originlarga ruxsat berish
             allowedMethods:
                 - GET
                 - POST

@@ -2,6 +2,7 @@ package uz.forall.youtube.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import uz.forall.youtube.entity.Category;
 import uz.forall.youtube.entity.Playlist;
 
@@ -18,7 +19,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             "               from playlist p " +
             "                        join video v on p.id = v.playlist_id " +
             "                        join category c on c.id = v.category_id " +
-            "               where c.id = 5 " +
+            "               where c.id = :categoryId " +
             "               group by p.id)", nativeQuery = true)
-    List<Playlist>findAllByCategoryId(Long id);
+    List<Playlist>findAllByCategoryId(@Param("categoryId") Long categoryId);
 }
