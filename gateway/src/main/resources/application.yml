@@ -101,6 +101,18 @@ spring:
           filters:
             - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
             - RewritePath=/youTube/(?<remaining>.*), /${remaining}  # /youTube ni olib tashlaydi
+
+
+        - id: library
+          uri: lb://library  # Load balancer orqali youTube servisi
+          predicates:
+              - Path=/library/**  # library servisi uchun yo'nalishlar
+          filters:
+            - AuthenticationFilter  # Auth servisi orqali tekshirish uchun filter
+            - RewritePath=/library/(?<remaining>.*), /${remaining}  # /library ni olib tashlaydi
+
+
+
       default-filters: # Barcha servislarga ruxsat berish
         - name: RequestSize
           args:

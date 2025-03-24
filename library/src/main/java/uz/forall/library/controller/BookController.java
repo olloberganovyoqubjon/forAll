@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("books")
 public class BookController {
     private final BookService bookService;
 
@@ -22,7 +22,7 @@ public class BookController {
     }
 
     // Category asosida qidirish
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("category/{categoryId}")
     public HttpEntity<?> getBooksByCategory(@PathVariable UUID categoryId) {
         ApiResult apiResult = bookService.getBooksByCategory(categoryId);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
@@ -30,14 +30,14 @@ public class BookController {
     }
 
     // Fayl turi asosida qidirish
-    @GetMapping("/type/{fileType}")
+    @GetMapping("type/{fileType}")
     public HttpEntity<?> getBooksByFileType(@PathVariable String fileType) {
         ApiResult apiResult = bookService.getBooksByFileType(fileType);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 
     // Category va fayl turi asosida qidirish
-    @GetMapping("/category/{categoryId}/type/{fileType}")
+    @GetMapping("category/{categoryId}/type/{fileType}")
     public HttpEntity<?> getBooksByCategoryAndFileType(@PathVariable UUID categoryId, @PathVariable String fileType) {
         ApiResult apiResult = bookService.getBooksByCategoryAndFileType(categoryId, fileType);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
@@ -45,14 +45,14 @@ public class BookController {
 
 
     // Fayl yuklash
-    @PostMapping("/upload/{categoryId}")
+    @PostMapping("upload/{categoryId}")
     public HttpEntity<?> uploadFile(@PathVariable UUID categoryId, @RequestParam("file") MultipartFile file) {
         ApiResult apiResult = bookService.saveFile(categoryId, file);
         return ResponseEntity.status(apiResult.isSuccess() ? 200 : 409).body(apiResult);
     }
 
     // Faylni olish (PDF, MP4, MP3)
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable UUID id) {
         ApiResult apiResult = bookService.getFile(id);
 

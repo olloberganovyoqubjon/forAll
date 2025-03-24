@@ -28,7 +28,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             "/notes",
             "/appStore",
             "/telephone",
-            "/youTube"
+            "/youTube",
+            "/library"
     );
 
     public AuthenticationFilter() {
