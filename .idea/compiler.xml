@@ -5,15 +5,51 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.36/5a30490a6e14977d97d9c73c924c1f1b5311ea95/lombok-1.18.36.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.38/57f8f5e02e92a30fd21b80cbd426a4172b5f8e29/lombok-1.18.38.jar" />
         </processorPath>
-        <module name="youTube.main" />
+        <module name="murojaat-socket.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="murojaat" target="17" />
       <module name="telephome" target="17" />
       <module name="telephome.main" target="17" />
       <module name="telephome.test" target="17" />
     </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="appStore" options="-parameters" />
+      <module name="appStore.main" options="-parameters" />
+      <module name="appStore.test" options="-parameters" />
+      <module name="appeal" options="-parameters" />
+      <module name="appeal.main" options="-parameters" />
+      <module name="appeal.test" options="-parameters" />
+      <module name="auth" options="-parameters" />
+      <module name="auth.main" options="-parameters" />
+      <module name="auth.test" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="gateway.main" options="-parameters" />
+      <module name="gateway.test" options="-parameters" />
+      <module name="library" options="-parameters" />
+      <module name="library.main" options="-parameters" />
+      <module name="library.test" options="-parameters" />
+      <module name="murojaat" options="-parameters" />
+      <module name="murojaat-socket" options="-parameters" />
+      <module name="murojaat-socket.main" options="-parameters" />
+      <module name="murojaat-socket.test" options="-parameters" />
+      <module name="notes" options="-parameters" />
+      <module name="notes.main" options="-parameters" />
+      <module name="notes.test" options="-parameters" />
+      <module name="server" options="-parameters" />
+      <module name="server.main" options="-parameters" />
+      <module name="server.test" options="-parameters" />
+      <module name="telephone" options="-parameters" />
+      <module name="telephone.main" options="-parameters" />
+      <module name="telephone.test" options="-parameters" />
+      <module name="youTube" options="-parameters" />
+      <module name="youTube.main" options="-parameters" />
+      <module name="youTube.test" options="-parameters" />
+    </option>
   </component>
 </project>

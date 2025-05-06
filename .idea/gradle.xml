@@ -44,6 +44,17 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/murojaat" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/murojaat-socket" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/murojaat-socket" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/notes" />
         <option name="modules">
           <set>

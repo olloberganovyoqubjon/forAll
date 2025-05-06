@@ -7,11 +7,19 @@
     <file type="web" url="file://$PROJECT_DIR$/auth" />
     <file type="web" url="file://$PROJECT_DIR$/gateway" />
     <file type="web" url="file://$PROJECT_DIR$/library" />
+    <file type="web" url="file://$PROJECT_DIR$/murojaat-socket" />
     <file type="web" url="file://$PROJECT_DIR$/notes" />
     <file type="web" url="file://$PROJECT_DIR$/server" />
     <file type="web" url="file://$PROJECT_DIR$/telephome" />
     <file type="web" url="file://$PROJECT_DIR$/telephone" />
     <file type="web" url="file://$PROJECT_DIR$/youTube" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/murojaat/pom.xml" />
+      </list>
+    </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21_PREVIEW" project-jdk-name="openjdk-23" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
