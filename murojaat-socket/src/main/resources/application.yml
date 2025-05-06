@@ -1,0 +1,22 @@
+server:
+  port: 8087
+
+
+socket-server:
+  port: 8085
+  host: 192.168.10.176
+
+
+
+spring:
+  application:
+    name: auth  # Application nomi
+  datasource:
+    driver-class-name: org.postgresql.Driver  # PostgreSQL driver nomi
+    url: jdbc:postgresql://localhost:5432/murojaat  # PostgreSQL manzili
+    username: postgres  # PostgreSQL foydalanuvchi nomi
+    password: 1  # PostgreSQL foydalanuvchi paroli
+  jpa:
+    hibernate:
+      ddl-auto: update  # DDL avtomatik yangilash
+    show-sql: true
