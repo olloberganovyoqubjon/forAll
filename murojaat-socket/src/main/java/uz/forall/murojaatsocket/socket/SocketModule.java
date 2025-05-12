@@ -4,12 +4,18 @@ import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
-import uz.forall.murojaatsocket.constants.Constants;
-import uz.forall.murojaatsocket.model.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uz.forall.murojaatsocket.model.User;
+import uz.forall.murojaatsocket.payload.ApiResult;
+import uz.forall.murojaatsocket.payload.MessageDto;
+import uz.forall.murojaatsocket.repository.UserRepository;
 
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
@@ -18,48 +24,103 @@ public class SocketModule {
 
     private final SocketIOServer server;
     private final SocketService socketService;
+    private final UserRepository userRepository;
 
-    public SocketModule(SocketIOServer server, SocketService socketService) {
+
+    //socketga bog'langan foydalanuvchilar username, socketId
+    private final Map<Long, UUID> userSocketMap = new ConcurrentHashMap<>();
+
+
+    public SocketModule(SocketIOServer server, SocketService socketService, UserRepository userRepository) {
         this.server = server;
         this.socketService = socketService;
+        this.userRepository = userRepository;
         server.addConnectListener(onConnected());
         server.addDisconnectListener(onDisconnected());
-        server.addEventListener("send_message", Message.class, onChatReceived());
+        server.addEventListener("send_message", MessageDto.class, onChatReceived());
 
     }
 
 
-    private DataListener<Message> onChatReceived() {
+    /**
+     * xabar jo'natish
+     * MessageDto (content, senderUserId, receiverUserId) keladi
+     *
+     * @return DataListener qaytadi
+     */
+    private DataListener<MessageDto> onChatReceived() {
         return (senderClient, data, ackSender) -> {
-            log.info(data.toString());
-            socketService.saveMessage(senderClient, data);
+//            qabul qiluvchi id raqami
+            Optional<User> optionalReceiverUser = userRepository.findById(data.getReceiverUserId());
+            Optional<User> optionalSenderUser = userRepository.findById(data.getSenderUserId());
+            if (optionalSenderUser.isEmpty() || optionalReceiverUser.isEmpty()) {
+                server.getClient(senderClient.getSessionId()).sendEvent("error", new ApiResult("Bunday foydalanuvchi mavjud emas!", false));
+            }
+            UUID receiverSocketId = userSocketMap.get(data.getReceiverUserId());
+//            agar foydalanuvchi online bo'lmasa receiverSocketId null ga teng bo'ladi, aks holda u online bo'ladi
+            boolean saveMessage;
+            if (receiverSocketId == null) {
+                saveMessage = socketService.saveMessage(data, false);
+                if (!saveMessage) {
+                    server.getClient(senderClient.getSessionId()).sendEvent("error", new ApiResult("Saqlashda muammo tug'uldi!", false));
+                }
+            } else {
+                saveMessage = socketService.saveMessage(data, true);
+                if (!saveMessage) {
+                    server.getClient(senderClient.getSessionId()).sendEvent("error", new ApiResult("Saqlashda muammo tug'uldi!", false));
+                } else {
+                    server.getClient(receiverSocketId).sendEvent("send_message", new ApiResult("success", true, data));
+                }
+            }
         };
     }
 
 
+    /**
+     * socketga bog'lanish
+     *
+     * @return ConnectListener
+     */
     private ConnectListener onConnected() {
         return (client) -> {
-//            String room = client.getHandshakeData().getSingleUrlParam("room");
-//            String username = client.getHandshakeData().getSingleUrlParam("room");
-            var params = client.getHandshakeData().getUrlParams();
-            String room = String.join("", params.get("room"));
-            String username = String.join("", params.get("username"));
-            client.joinRoom(room);
-            socketService.saveInfoMessage(client, username + Constants.WELCOME_MESSAGE, room);
-            log.info("Socket ID[{}] - room[{}] - username [{}]  Connected to chat module through", client.getSessionId().toString(), room, username);
+            List<String> userIdList = client.getHandshakeData().getUrlParams().get("userId");
+            if (userIdList == null || userIdList.isEmpty()) {
+                log.warn("userId not provided in handshake");
+                return;
+            }
+            try {
+                Long userId = Long.valueOf(userIdList.get(0));
+                Optional<User> optionalUser = userRepository.findById(userId);
+                if (optionalUser.isEmpty()) {
+                    log.warn("user not found");
+                }
+                userSocketMap.put(userId, client.getSessionId());
+            } catch (NumberFormatException e) {
+                log.error("Invalid userId format: {}", userIdList.get(0));
+            }
         };
 
     }
 
+
+    /**
+     * socketdan chiqish
+     *
+     * @return DisconnectListener
+     */
     private DisconnectListener onDisconnected() {
         return client -> {
-            var params = client.getHandshakeData().getUrlParams();
-            String room = String.join("", params.get("room"));
-            String username = String.join("", params.get("username"));
-            socketService.saveInfoMessage(client, username + Constants.DISCONNECT_MESSAGE, room);
-            log.info("Socket ID[{}] - room[{}] - username [{}]  discnnected to chat module through", client.getSessionId().toString(), room, username);
+            List<String> userIdList = client.getHandshakeData().getUrlParams().get("userId");
+            if (userIdList == null || userIdList.isEmpty()) {
+                log.warn("userId not provided in handshake");
+                return;
+            }
+            try {
+                Long userId = Long.valueOf(userIdList.get(0));
+                userSocketMap.remove(userId);
+            } catch (NumberFormatException e) {
+                log.error("Invalid userId format: {}", userIdList.get(0));
+            }
         };
     }
-
-
 }

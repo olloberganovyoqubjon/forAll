@@ -1,7 +1,9 @@
 package uz.forall.murojaatsocket.model;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @EqualsAndHashCode(callSuper = true)
@@ -11,15 +13,13 @@ import lombok.*;
 @Data
 @Builder
 @ToString
-public class Message extends BaseModel {
+@Table(name = "users")
+public class User extends BaseModel{
 
-    private String content;
-
-    @ManyToOne
-    private User senderUser;
+    private String username;
 
     @ManyToOne
-    private User receiverUser;
+    private Organization organization;
 
-    private Boolean isRead;
+    private Boolean isOrderly;
 }

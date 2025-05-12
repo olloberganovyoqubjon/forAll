@@ -1,26 +1,25 @@
 package uz.forall.murojaatsocket.controller;
 
-//import com.example.demo.model.Message;
-//import com.example.demo.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uz.forall.murojaatsocket.model.Message;
+import uz.forall.murojaatsocket.payload.ApiResult;
 import uz.forall.murojaatsocket.service.MessageService;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/message")
+@RequestMapping("message")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
 
     @CrossOrigin
-    @GetMapping("/{room}")
-    public ResponseEntity<List<Message>> getMessages(@PathVariable String room) {
-        return ResponseEntity.ok(messageService.getMessages(room));
+    @GetMapping("{senderUserId}/{receiverUserId}")
+    public HttpEntity<?> getMessages(@PathVariable Long senderUserId, @PathVariable Long receiverUserId) {
+        ApiResult apiResult = messageService.getMessages(senderUserId,receiverUserId);
+        return new ResponseEntity<>(apiResult, HttpStatus.OK);
     }
 
 
