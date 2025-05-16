@@ -23,6 +23,10 @@ spring:
       hibernate:
         enable_lazy_load_no_trans: true  # Lazy loadingni yoqish
 
+app:
+  jwtExpirationMs: 86400000
+  jwtSecret: your-super-long-secure-secret-key-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+
 eureka:
   client:
     service-url:

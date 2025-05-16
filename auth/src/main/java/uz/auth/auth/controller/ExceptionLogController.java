@@ -4,22 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uz.auth.auth.entity.Role;
-import uz.auth.auth.repository.RoleRepository;
+import uz.auth.auth.entity.ExceptionLogs;
+import uz.auth.auth.repository.ExceptionLogsRepository;
 
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/api/roles")
-public class RoleController {
-
+@RequestMapping("/api/error-logs")
+public class ExceptionLogController {
     @Autowired
-    RoleRepository roleRepository;
-
+    private ExceptionLogsRepository exceptionLogsRepository;
 
     @GetMapping("/list")
-    public List<Role> getAllRoles(){
-        return roleRepository.findAll();
+    public List<ExceptionLogs> getAllAuditLogs() {
+        return exceptionLogsRepository.findAll();
     }
 
 

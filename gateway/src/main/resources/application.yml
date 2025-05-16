@@ -15,14 +15,16 @@ spring:
       httpserver:
         wiretap: true  # Wiretapni yoqish
       globalcors: # Barcha servislarga ruxsat berish
+        add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
             allowedOrigins:
 #            "http://localhost:3000"       # Barcha originlarga ruxsat berish
+                - "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
                 - "http://localhost:3000"       # Barcha originlarga ruxsat berish
                 - "http://localhost:3001"
-                - "http://192.168.10.181:3000"  # Barcha originlarga ruxsat berish
                 - "http://192.168.10.181:3001"  # Barcha originlarga ruxsat berish
+                - "http://192.168.10.172:3000"  # Barcha originlarga ruxsat berish
             allowedMethods:
                 - GET
                 - POST

@@ -1,92 +1,150 @@
 package uz.auth.auth.controller;
 
-import uz.auth.auth.payload.ApiResult;
-import uz.auth.auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.LogoutSuccessEvent;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+import uz.auth.auth.dto.LoginRequest;
+import uz.auth.auth.dto.UserResponse;
+import uz.auth.auth.entity.User;
+import uz.auth.auth.jwt.JwtUtils;
+import uz.auth.auth.repository.UserRepository;
+import uz.auth.auth.service.CustomUserDetailsService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/account")
+@RequiredArgsConstructor
 public class AuthController {
 
-    /**
-     * Основное назначение:
-     *
-     * @RestController: Объявление класса как контроллера REST API.
-     * @RequestMapping("/api/auth"): Базовый путь для всех запросов, обрабатываемых этим контроллером.
-     * @Tag(name = "AuthController", description = "Autentification uchun"): Аннотация Swagger для группировки операций в документации.
-     * @Autowired AuthService service: Внедрение зависимости сервиса AuthService.
-     * @PostMapping("/login"): Обработчик POST запроса для выполнения входа в систему.
-     * @RequestBody LoginDto dto: Параметр запроса, содержащий данные для входа (имя пользователя и пароль).
-     * ApiResult apiResult = service.login(dto);: Вызов метода login сервиса AuthService для выполнения аутентификации.
-     * return ResponseEntity.status(apiResult.isSuccess() ? HttpStatus.CREATED : HttpStatus.CONFLICT).body(apiResult);:
-     * Возврат HTTP ответа с кодом 201 Created в случае успешного входа и 409 Conflict в противном случае.
-     * @GetMapping("/refreshToken"): Обработчик GET запроса для обновления токена доступа.
-     * @RequestParam String token: Параметр запроса, содержащий токен, который нужно обновить.
-     * ApiResult apiResult = service.updateAccessToken(token);: Вызов метода updateAccessToken сервиса AuthService
-     * для обновления токена доступа.
-     * return ResponseEntity.status(apiResult.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResult);:
-     * Возврат HTTP ответа с кодом 200 OK в случае успешного обновления и 409 Conflict в противном случае.
-     * Примечания:
-     * Контроллер предоставляет два основных HTTP метода для аутентификации и обновления токена.
-     * Используется объект ApiResult для упрощения возврата результатов операций.
-     * Используются статусы HTTP (например, HttpStatus.CREATED и HttpStatus.OK) для передачи информации о статусе операции.
-     * В случае возникновения ошибки, обрабатываемой сервисом, возвращается HTTP статус 409 Conflict.
-     */
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthService service;
-
-//    private final AuthenticationService authenticationService;
-
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtUtils jwtUtils;
+    private final UserRepository userRepository;
     @Autowired
-    public AuthController(AuthService service) {
-        this.service = service;
-//        this.authenticationService = authenticationService;
+    private ApplicationEventPublisher eventPublisher;
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody LoginRequest loginRequest) {
+        logger.info("Login attempt for username: {}", loginRequest.getUsername());
+
+        // Authenticate the user
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+        );
+
+        // Load the user details
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+// Load user entity from DB
+        User user = (User) authentication.getPrincipal();
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
+        // Generate JWT token
+        String jwt = jwtUtils.generateJwtToken(userDetails);
+
+        // Create user response
+        UserResponse userResponse = new UserResponse(
+                userDetails.getUsername(),
+                userDetails.getAuthorities().stream()
+                        .map(authority -> authority.getAuthority())
+                        .collect(Collectors.toList())
+        );
+
+        // Build response
+        Map<String, Object> response = new HashMap<>();
+        response.put("serviceToken", jwt);
+        response.put("user", userResponse);
+
+        logger.info("Login successful for username: {}", loginRequest.getUsername());
+        return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null && authentication.getPrincipal() instanceof UserDetails
+                ? ((UserDetails) authentication.getPrincipal()).getUsername()
+                : "unknown";
+        logger.info("Logout attempt for username: {}", username);
 
+        // JWT is stateless, so no server-side invalidation is needed
+        // Client will clear token via useAuth logout
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Logged out successfully");
 
+        logger.info("Logout successful for username: {}", username);
 
-    @GetMapping("/refreshToken")
-    public HttpEntity<?> refreshToken(@RequestParam String token) {
-        // Вызов сервисного метода для обновления токена доступа
-        ApiResult apiResult = service.updateAccessToken(token);
-        // Возврат HTTP ответа в зависимости от успешности операции
-        return ResponseEntity.status(apiResult.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResult);
+        // Manually publish the logout event
+        eventPublisher.publishEvent(new LogoutSuccessEvent(authentication));
+
+        return ResponseEntity.ok(response);
     }
 
-
-//    @Operation(summary = "Авторизация пользователя")
-//    @PostMapping("/sign-in")
-//    public HttpEntity<?> signIn(@RequestBody @Valid SignInRequest request) {
-//        AuthenticationResponse authenticate = authenticationService.signIn(request);
-//        if (authenticate.getAccessToken() == null)
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(authenticate);
-//        return ResponseEntity.status(HttpStatus.OK).body(authenticate);
-//
+//    @GetMapping("/me")
+//    public ResponseEntity<User> getCurrentUser(Authentication authentication) {
+//        // Get the current user from the security context
+//        User currentUser = (User) authentication.getPrincipal();
+//        return ResponseEntity.ok(currentUser);
 //    }
 
-    @GetMapping("validate")
-    public HttpEntity<?> validateToken(@RequestParam String token) {
-        ApiResult apiResult = service.validateToken(token);
-        if (apiResult.isSuccess()) {
-            Map<String, Long> response = new HashMap<>();
-            response.put("userId", apiResult.getUserId()); // Haqiqiy userId qo'yiladi
-            return ResponseEntity.ok().body(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, Object>> getCurrentUser() {
+        logger.info("Processing /api/account/me");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof UserDetails)) {
+            logger.error("User not authenticated for /api/account/me");
+            return ResponseEntity.status(401).body(Map.of("error", "User not authenticated"));
         }
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        logger.info("Fetching details for user: {}", userDetails.getUsername());
+
+        UserResponse userResponse = new UserResponse(
+                userDetails.getUsername(),
+                userDetails.getAuthorities().stream()
+                        .map(authority -> authority.getAuthority())
+                        .collect(Collectors.toList())
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userResponse);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("validate")
+    public ResponseEntity<?> validateToken(@RequestParam String token) {
+        String usernameFromJwtToken = jwtUtils.getUsernameFromJwtToken(token);
+        if (usernameFromJwtToken != null) {
+            Optional<User> optionalUser = userRepository.findByUsername(usernameFromJwtToken);
+            if (optionalUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid token"));
+            }
+            User user = optionalUser.get();
+            Map<String, Long> response = new HashMap<>();
+            response.put("userId", user.getId()); // Haqiqiy userId qo'yiladi
+            return ResponseEntity.ok().body(response);
+
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid token"));
     }
 }
-
-
-

@@ -1,19 +1,26 @@
 package uz.murojaat.appeal.config;
 
-
-import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@org.springframework.context.annotation.Configuration
+@Configuration
 public class SocketIOConfig {
+
+    @Value("${socket-server.host}")
+    private String host;
+
+    @Value("${socket-server.port}")
+    private Integer port;
 
     @Bean
     public SocketIOServer socketIOServer() {
-        Configuration config = new Configuration();
-        config.setHostname("localhost");
-        config.setPort(9092);  // Portni kerakli qiymatga o'zgartiring
-
+        com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
+        config.setHostname(host);
+        config.setPort(port);
+        //  config.setContext("/socket.io");
         return new SocketIOServer(config);
     }
+
 }

@@ -22,14 +22,15 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     private AuthFeignClient authFeignClient;
 
     private static final List<String> EXCLUDED_PATHS = List.of(
-            "/user/login", "/auth/validate",
+            "/api/account/login","/api/account/logout","/api/account/me",
             "/parsing/presidentNews", "/parsing/wether", "/parsing/uploadPars", "/parsing/rade", "/parsing/newsByIdSites", "/parsing/allSitesWithCategory", "/parsing/newsByIdSite"
             ,"/python_translate/text", "/python_translate/upload/",
             "/notes",
             "/appStore",
             "/telephone",
             "/youTube",
-            "/library"
+            "/library",
+            "/appeal"
     );
 
     public AuthenticationFilter() {

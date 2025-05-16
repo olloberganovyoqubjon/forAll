@@ -1,13 +1,29 @@
 server:
   port: 8082  # auth server porti
 
-spring:
-  application:
-    name: appeal  # Application nomi
-
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/  # Eureka server manzili
   instance:
     prefer-ip-address: true # IP manzilni o'zi tanlasin
+
+
+socket-server:
+  port: 8085
+  host: 192.168.10.176
+
+
+
+spring:
+  application:
+    name: appeal  # Application nomi
+  datasource:
+    driver-class-name: org.postgresql.Driver  # PostgreSQL driver nomi
+    url: jdbc:postgresql://localhost:5432/murojaat  # PostgreSQL manzili
+    username: postgres  # PostgreSQL foydalanuvchi nomi
+    password: 1  # PostgreSQL foydalanuvchi paroli
+  jpa:
+    hibernate:
+      ddl-auto: update  # DDL avtomatik yangilash
+    show-sql: true
